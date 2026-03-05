@@ -1,0 +1,71 @@
+# VibeOS-2 — Agent Boot
+
+## What Is VibeOS-2
+
+A **self-deploying enterprise governance framework** for AI-assisted development. Any AI agent (Claude Code, Cursor, Codex) reads the playbooks, asks questions, and autonomously builds a complete governance system customized to the user's project.
+
+## Architecture
+
+```
+AGENT-BOOTSTRAP.md          ← Master playbook (agent entry point)
+PROJECT-INTAKE.md            ← 18-question structured intake
+decision-engine/             ← Decision trees for setup choices
+        ↓ (agent reads, decides, executes)
+scripts/                     ← 20 working gate scripts (copied to target project)
+reference/                   ← Annotated examples (agent reads + adapts)
+helpers/                     ← Mechanical utilities (agent calls)
+```
+
+## Source Projects
+
+This framework is extracted from two production projects:
+- **SalesSidekick** — `/Users/latifhorst/cursor projects/SalesSidekick/SalesSidekick/`
+- **Signal Intelligence Platform** — `/Users/latifhorst/cursor projects/SignalIntelligencePlatform/`
+
+When extracting scripts or patterns, read the source, understand it, then parameterize for universal use.
+
+## Implementation Plan
+
+Full plan: `docs/PLAN.md`
+
+## Key Rules
+
+1. **All scripts must be working implementations** — no stubs, no placeholders, no TODOs
+2. **Scripts are parameterized** — env vars and CLI args, not hardcoded paths
+3. **Reference files use annotations** — `<!-- REQUIRED -->`, `<!-- ADAPT -->`, `<!-- OPTIONAL -->`, `<!-- EXAMPLE -->`
+4. **Decision engine uses decision trees** — IF/THEN/ELSE, not prose
+5. **Playbooks use INPUT/OUTPUT/STORE** — every phase declares data flow
+6. **Graceful degradation** — optional tools skip with WARNING, never crash
+
+## Quality Gates
+
+```bash
+# Validate all scripts are syntactically valid
+for f in scripts/*.sh; do bash -n "$f"; done
+
+# Validate all JSON
+for f in $(find . -name "*.json" -not -path './.git/*'); do jq . "$f" > /dev/null; done
+
+# Validate no placeholders remain
+grep -rn '{{.*}}' scripts/ helpers/ decision-engine/ || echo "No placeholders found"
+
+# Test gate-runner
+bash scripts/gate-runner.sh pre_commit --continue-on-failure
+```
+
+## Technology
+
+| Tool | Purpose |
+|---|---|
+| Bash 4+ | Gate scripts, helpers |
+| Python 3.7+ | Stub detection, advanced validators |
+| jq | JSON template rendering, manifest parsing |
+| git | Version control |
+| pre-commit | Hook management |
+
+## Conventions
+
+- Shell scripts: `#!/usr/bin/env bash`, `set -euo pipefail`
+- Exit codes: 0 = pass, 1 = fail, 2 = skip (graceful degradation)
+- Logging: `echo "[GATE_NAME] PASS|FAIL|WARN|SKIP: message"`
+- Version: `FRAMEWORK_VERSION="1.0.0"` in every script
