@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "VibeOS-2",
+    "slug": "vibeos-2",
+    "language": "bash",
+    "framework": "none"
+  },
+  "tiers": {
+    "0": { "label": "critical", "blocking": true },
+    "1": { "label": "important", "blocking": true },
+    "2": { "label": "advisory", "blocking": false },
+    "3": { "label": "informational", "blocking": false }
+  },
+  "phases": {
+    "session_start": {
+      "gates": [
+        {
+          "name": "session-start-validation",
+          "script": "scripts/validate-session-start.sh",
+          "tier": 2,
+          "env": { "REQUIRED_DOCS": "CLAUDE.md README.md" }
+        }
+      ]
+    },
+    "pre_commit": {
+      "gates": [
+        {
+          "name": "no-secrets",
+          "script": "scripts/validate-no-secrets.sh",
+          "tier": 0
+        },
+        {
+          "name": "security-patterns",
+          "script": "scripts/validate-security-patterns.sh",
+          "tier": 0
+        }
+      ]
+    },
+    "wo_exit": {
+      "includes": ["pre_commit"],
+      "gates": [
+        {
+          "name": "work-order-validation",
+          "script": "scripts/validate-work-order.sh",
+          "tier": 1,
+          "env": { "WO_DIR": "docs/planning" }
+        }
+      ]
+    },
+    "full_audit": {
+      "includes": ["wo_exit"],
+      "gates": [
+        {
+          "name": "owasp-alignment",
+          "script": "scripts/validate-owasp-alignment.sh",
+          "tier": 1
+        },
+        {
+          "name": "pii-handling",
+          "script": "scripts/validate-pii-handling.sh",
+          "tier": 2
+        }
+      ]
+    }
+  },
+  "known_baselines": {}
+}
