@@ -1,0 +1,30 @@
+# <!-- REQUIRED -->
+# <!-- ADAPT: Replace $PROJECT_NAME with project name -->
+# $PROJECT_NAME — Work Order Index
+
+## Active Work Orders
+
+| WO | Title | Status | Phase | Owner |
+|----|-------|--------|-------|-------|
+<!-- EXAMPLE: | WO-001 | Initial setup | Active | Phase 1 | @dev | -->
+
+## Completed Work Orders
+
+| WO | Title | Completed | Summary |
+|----|-------|-----------|---------|
+<!-- Completed WOs move here with date and summary -->
+
+## Blocked Work Orders
+
+| WO | Title | Blocker | Since |
+|----|-------|---------|-------|
+<!-- Blocked WOs with blocker description -->
+
+---
+
+## Protocol
+
+- One entry per Work Order
+- Update status immediately when WO state changes
+- Move to Completed with date when all phases done and gates pass
+- This is the **single source of truth** for WO tracking

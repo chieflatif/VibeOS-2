@@ -1,0 +1,119 @@
+# <!-- REQUIRED: Agent generates this file customized to the project -->
+# <!-- ADAPT: Project name, architecture, stack, governance rules -->
+# $PROJECT_NAME — Agent Boot
+
+## What Is $PROJECT_NAME
+
+<!-- ADAPT: Agent writes 3-5 sentence description based on PROJECT-INTAKE.md answers -->
+<!-- REQUIRED: Must describe what the project IS and IS NOT -->
+
+## Architecture
+
+<!-- ADAPT: Agent generates architecture diagram from project's module structure -->
+<!-- REQUIRED: Must show module boundaries and dependency direction -->
+
+```
+<!-- EXAMPLE: Replace with actual project architecture -->
+Surface Layer (API, CLI, UI)
+        ↓
+Business Logic (services, processors)
+        ↓
+Data Layer (repositories, models)
+        ↑
+External Adapters (APIs, message queues)
+```
+
+### Module Structure
+
+```
+<!-- ADAPT: Agent scans project dirs and generates actual structure -->
+src/
+├── api/          # <!-- ADAPT: Describe each directory's purpose -->
+├── services/
+├── models/
+└── config/
+```
+
+### Architecture Rules
+
+<!-- ADAPT: Agent generates rules from enforce-architecture.sh rules file -->
+<!-- REQUIRED: Must list all architecture rules that are enforced -->
+
+## Technology Stack
+
+<!-- ADAPT: Agent fills from PROJECT-INTAKE.md answers -->
+<!-- REQUIRED: Must include language, framework, database, cloud provider -->
+
+| Technology | Purpose |
+|---|---|
+| $LANGUAGE | Runtime |
+| $FRAMEWORK | Web framework |
+
+## Governance
+
+### Three Laws
+<!-- REQUIRED: These are non-negotiable -->
+1. No remediation without a Work Order
+2. No Work Order without an evidence-backed finding
+3. No finding without investigation
+
+### Quality Gates
+
+<!-- ADAPT: Agent lists active phases from quality-gate-manifest.json -->
+
+```bash
+# Before every commit
+bash scripts/gate-runner.sh pre_commit --continue-on-failure
+
+# After completing a Work Order
+bash scripts/gate-runner.sh wo_exit --continue-on-failure
+
+# Comprehensive audit
+bash scripts/gate-runner.sh full_audit --continue-on-failure
+```
+
+### Quality Gates (source of truth: `.claude/quality-gate-manifest.json`)
+
+<!-- ADAPT: Agent lists gates per phase from manifest -->
+
+### Zero-Stub Policy
+<!-- REQUIRED -->
+No `NotImplementedError`, no `pass`-only functions, no `# TODO` in committed code. If it can't be implemented fully, flag it as a blocker.
+
+## Development Workflow
+
+<!-- ADAPT: Agent generates from language/framework/package manager -->
+
+```bash
+# <!-- EXAMPLE: Python -->
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+pre-commit install
+
+# <!-- EXAMPLE: TypeScript -->
+# npm install
+# npm run build
+# npm test
+```
+
+## Work Order Protocol
+
+<!-- REQUIRED -->
+```
+Phase 0: Research    → Dependencies, impact analysis, test plan
+Phase 1+: Implement  → Code + tests
+Phase N: Audit       → gate-runner.sh wo_exit
+Phase N+1: Commit    → Only if gates pass
+```
+
+### Single Tracker
+All WO status tracked in `docs/planning/WO-INDEX.md` (one file, no parity checking).
+
+## Key Design Decisions
+
+<!-- ADAPT: Agent documents project-specific architectural decisions -->
+
+## Compliance Targets
+
+<!-- ADAPT: Agent fills from PROJECT-INTAKE.md compliance answers -->
+<!-- OPTIONAL: Only include if compliance targets != "none" -->

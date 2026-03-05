@@ -1,0 +1,30 @@
+# <!-- REQUIRED -->
+# Skill: /quality-gate-check
+
+## Description
+Run quality gates for a specific WO lifecycle phase using the Quality Gate Manifest.
+
+## Trigger
+User types `/quality-gate-check` or asks to "run quality gates"
+
+## Behavior
+
+1. Determine the appropriate phase:
+   - If user specifies a phase, use it
+   - If in a WO context, use `wo_exit`
+   - Default to `pre_commit`
+
+2. Run the gate runner:
+   ```bash
+   bash scripts/gate-runner.sh <phase> --continue-on-failure
+   ```
+
+3. Report results:
+   - List each gate with PASS/FAIL status
+   - For failures, show the blocking vs advisory distinction
+   - Suggest fixes for blocking failures
+   - For advisory failures, note them but don't block progress
+
+## Parameters
+- `phase` — Gate phase to run (default: pre_commit)
+- `--wo NUMBER` — Work order number for WO-specific gates

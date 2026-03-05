@@ -1,0 +1,26 @@
+# <!-- REQUIRED -->
+# Skill: /post-phase-audit
+
+## Description
+Launch independent audit after completing a development phase.
+
+## Trigger
+User types `/post-phase-audit` or after completing a significant implementation phase.
+
+## Behavior
+
+1. **Run full_audit gates**:
+   ```bash
+   bash scripts/gate-runner.sh full_audit --continue-on-failure --json
+   ```
+2. **Parse JSON results** — categorize by tier and severity
+3. **Generate audit report**:
+   - Blocking issues (must fix before proceeding)
+   - Advisory issues (document, fix when practical)
+   - Baselined issues (pre-existing, tracked in manifest)
+4. **Compare with previous audit** — identify regressions vs improvements
+5. **Update WO** — add audit findings to current work order
+
+## Parameters
+- `--wo NUMBER` — Associate audit with a specific WO
+- `--phase PHASE` — Specific phase to audit (default: full_audit)

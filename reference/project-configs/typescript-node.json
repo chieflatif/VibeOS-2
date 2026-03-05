@@ -1,0 +1,48 @@
+{
+  "_description": "Example project config for a TypeScript Node.js project",
+  "project": {
+    "name": "Example Node Service",
+    "slug": "example-node",
+    "description": "Backend service built with Express and TypeScript",
+    "language": "typescript",
+    "framework": "express",
+    "source_dirs": ["src"],
+    "test_dir": "tests",
+    "package_manager": "npm",
+    "database": "postgresql",
+    "cloud_provider": "azure"
+  },
+  "team": {
+    "size": "enterprise",
+    "compliance_targets": ["SOC 2", "OWASP"],
+    "frozen_files": ["src/index.ts"],
+    "production_urls": ["https://api.example.com", "https://app.example.com"]
+  },
+  "agent": {
+    "preferred": "claude-code",
+    "multi_agent": true
+  },
+  "architecture_rules": [
+    {
+      "name": "controller-isolation",
+      "type": "forbidden_imports",
+      "description": "Controllers cannot import from data access layer",
+      "source": "src/controllers/",
+      "forbidden": ["src/repositories/", "src/db/"]
+    },
+    {
+      "name": "middleware-isolation",
+      "type": "forbidden_imports",
+      "description": "Middleware cannot import from controllers",
+      "source": "src/middleware/",
+      "forbidden": ["src/controllers/"]
+    },
+    {
+      "name": "no-raw-sql",
+      "type": "forbidden_patterns",
+      "description": "Use query builder or ORM",
+      "pattern": "query\\(\\s*`|query\\(\\s*[\"'].*\\$\\{",
+      "paths": ["src/"]
+    }
+  ]
+}

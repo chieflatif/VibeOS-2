@@ -1,0 +1,54 @@
+# <!-- REQUIRED -->
+# WO-$PROJECT_SLUG-NNN: Title
+
+## Status: Draft
+
+## Objective
+
+<!-- What problem does this solve? Why now? -->
+
+## Scope
+
+<!-- What's in scope and what's explicitly out of scope? -->
+
+## Acceptance Criteria
+
+- [ ] <!-- Criterion 1 -->
+- [ ] <!-- Criterion 2 -->
+- [ ] All quality gates pass (`bash scripts/gate-runner.sh wo_exit`)
+
+## Dependencies
+
+<!-- What must exist before this WO can start? -->
+
+## Impact Analysis
+
+<!-- What existing functionality could be affected? -->
+
+## Implementation
+
+### Phase 0: Research
+
+- [ ] Dependency mapping
+- [ ] Impact analysis
+- [ ] Test strategy
+
+### Phase 1: Implementation
+
+- [ ] <!-- Task 1 -->
+- [ ] <!-- Task 2 -->
+- [ ] Unit tests
+
+### Phase 2: Audit
+
+- [ ] `bash scripts/gate-runner.sh wo_exit --continue-on-failure`
+- [ ] All blocking gates pass
+- [ ] Advisory findings documented
+
+## Evidence
+
+<!-- Links to test results, gate output, screenshots -->
+
+## Notes
+
+<!-- Additional context, decisions made during implementation -->

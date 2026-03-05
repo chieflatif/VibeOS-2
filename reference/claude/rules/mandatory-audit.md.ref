@@ -1,0 +1,26 @@
+# <!-- REQUIRED -->
+# Mandatory Audit (Always Active)
+
+## After Every Phase Completion
+
+Run the appropriate quality gate phase:
+
+```bash
+# After implementation work
+bash scripts/gate-runner.sh wo_exit --continue-on-failure
+
+# Before any commit
+bash scripts/gate-runner.sh pre_commit --continue-on-failure
+```
+
+## Audit Results
+
+- **Blocking failures** (tier 0-1): Must be resolved before proceeding
+- **Advisory failures** (tier 2-3): Document in WO, resolve when practical
+- **Baselined failures**: Pre-existing issues tracked in manifest, not regressions
+
+## No Silent Failures
+
+- Every gate run must be acknowledged
+- Failed gates must have a resolution path documented
+- Do not suppress or ignore gate output

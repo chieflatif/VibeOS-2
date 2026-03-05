@@ -1,0 +1,63 @@
+# <!-- ADAPT: Agent generates this from project config -->
+# $PROJECT_NAME — Infrastructure Manifest
+
+## Purpose
+
+This document is the single source of truth for "where is everything" in this project's infrastructure. Updated every session start.
+
+## Environments
+
+<!-- ADAPT: Fill from project config -->
+
+| Environment | URL | Status |
+|-------------|-----|--------|
+| Staging | <!-- URL --> | Active |
+| Production | <!-- URL --> | Active |
+
+## Services
+
+<!-- ADAPT: List all services the project depends on -->
+
+| Service | Provider | Environment Variable | Purpose |
+|---------|----------|---------------------|---------|
+<!-- EXAMPLE: | Database | PostgreSQL | DATABASE_URL | Primary data store | -->
+<!-- EXAMPLE: | Auth | Entra ID | AZURE_CLIENT_ID | Authentication | -->
+
+## Environment Variables
+
+<!-- ADAPT: List all env vars the project uses (values in .env, not here) -->
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+<!-- EXAMPLE: | DATABASE_URL | Yes | PostgreSQL connection string | -->
+<!-- EXAMPLE: | API_KEY | Yes | External API authentication | -->
+
+## Health Endpoints
+
+<!-- OPTIONAL: Only if project has health endpoints -->
+
+| Endpoint | Expected Response | Used By |
+|----------|-------------------|---------|
+<!-- EXAMPLE: | /health | {"status": "ok"} | health-check.sh | -->
+
+## Deployment
+
+<!-- ADAPT: Describe deployment method -->
+<!-- EXAMPLE:
+### Method: Container Apps
+- Registry: Azure Container Registry
+- Pipeline: GitHub Actions
+- Trigger: Push to main
+-->
+
+## Monitoring
+
+<!-- OPTIONAL: Only if project has monitoring -->
+
+| Tool | Purpose | Dashboard URL |
+|------|---------|---------------|
+
+## Last Updated
+
+<!-- Auto-updated by session-start hook -->
+$DATE

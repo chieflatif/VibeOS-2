@@ -1,0 +1,63 @@
+# <!-- ADAPT: Agent generates AGENTS.md customized to the project -->
+# <!-- Codex does not support hooks — governance rules must be embedded as text instructions -->
+
+# $PROJECT_NAME — Agent Instructions
+
+## Governance Rules
+
+### Three Laws
+1. No remediation without a Work Order
+2. No Work Order without an evidence-backed finding
+3. No finding without investigation
+
+### Work Order Protocol
+- Track all work in `docs/planning/WO-INDEX.md`
+- Run `bash scripts/gate-runner.sh pre_commit` before every commit
+- Run `bash scripts/gate-runner.sh wo_exit` after completing a Work Order
+- Use commit format: `feat(wo-NNN): description`
+
+### Zero-Stub Policy
+No stubs, placeholders, or TODO comments in committed code. If something cannot be fully implemented, document the blocker in the Work Order.
+
+## Security Rules
+
+- NEVER hardcode secrets in source code
+- NEVER use string formatting for SQL queries
+- NEVER target production URLs
+- NEVER force push
+- ALWAYS use parameterized queries
+- ALWAYS store secrets in environment variables
+- ALWAYS validate external input at system boundaries
+
+## Architecture
+
+<!-- ADAPT: Agent generates from project config -->
+<!-- EXAMPLE:
+### Module Boundaries
+- API layer cannot import from data layer
+- Business logic must not contain I/O operations
+- No circular dependencies
+-->
+
+## Quality Gates
+
+```bash
+bash scripts/gate-runner.sh pre_commit --continue-on-failure
+bash scripts/gate-runner.sh wo_exit --continue-on-failure
+bash scripts/gate-runner.sh full_audit --continue-on-failure
+```
+
+## Development
+
+<!-- ADAPT: Agent fills from project config -->
+
+```bash
+# Setup
+# <!-- ADAPT: language-specific setup commands -->
+
+# Test
+# <!-- ADAPT: test commands -->
+
+# Lint
+# <!-- ADAPT: lint commands -->
+```

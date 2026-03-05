@@ -1,0 +1,30 @@
+# <!-- REQUIRED -->
+# Skill: /wo-complete
+
+## Description
+Complete a work order with quality gate audit, commit, and tracker updates.
+
+## Trigger
+User types `/wo-complete` or says "complete WO-NNN"
+
+## Behavior
+
+1. **Identify the WO** — from argument or current context
+2. **Run wo_exit gates**:
+   ```bash
+   bash scripts/gate-runner.sh wo_exit --continue-on-failure --wo <NUMBER>
+   ```
+3. **Check results**:
+   - If blocking failures: report them, do NOT proceed
+   - If only advisory failures: note them, proceed
+4. **Update WO file** — mark status as Complete, add audit results
+5. **Update WO-INDEX.md** — move entry to Completed table
+6. **Stage and commit**:
+   ```bash
+   git add <changed files>
+   git commit -m "feat(wo-<NUMBER>): <WO title>"
+   ```
+7. **Report** — summary of what was completed
+
+## Parameters
+- `wo` — Work order number (required)

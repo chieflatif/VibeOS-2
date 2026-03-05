@@ -1,0 +1,41 @@
+{
+  "_description": "Example project config for a Python FastAPI project",
+  "project": {
+    "name": "Example FastAPI Service",
+    "slug": "example-fastapi",
+    "description": "REST API service built with FastAPI",
+    "language": "python",
+    "framework": "fastapi",
+    "source_dirs": ["src", "app"],
+    "test_dir": "tests",
+    "package_manager": "pip",
+    "database": "postgresql",
+    "cloud_provider": "aws"
+  },
+  "team": {
+    "size": "small",
+    "compliance_targets": ["OWASP"],
+    "frozen_files": [],
+    "production_urls": ["https://api.example.com"]
+  },
+  "agent": {
+    "preferred": "claude-code",
+    "multi_agent": false
+  },
+  "architecture_rules": [
+    {
+      "name": "api-purity",
+      "type": "forbidden_imports",
+      "description": "API routes cannot import from data layer",
+      "source": "src/api/",
+      "forbidden": ["src/models/", "src/db/"]
+    },
+    {
+      "name": "no-raw-sql",
+      "type": "forbidden_patterns",
+      "description": "Use parameterized queries only",
+      "pattern": "cursor\\.execute\\(\\s*f[\"']|execute\\(.*%s.*%",
+      "paths": ["src/"]
+    }
+  ]
+}

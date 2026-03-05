@@ -1,0 +1,37 @@
+# <!-- REQUIRED -->
+# Work Order Protocol (Always Active)
+
+## Work Order Lifecycle
+
+```
+Phase 0: Research    → Dependencies, impact analysis, test plan
+Phase 1+: Implement  → Code + tests per phase
+Phase N: Audit       → gate-runner.sh wo_exit
+Phase N+1: Commit    → Only if gates pass
+```
+
+## Required WO Sections
+
+Every Work Order file must contain:
+1. **Objective** — What and why
+2. **Acceptance Criteria** — Definition of done
+3. **Tasks/Phases** — Implementation breakdown
+4. **Status** — Current state (Draft/Active/Complete/Blocked)
+
+## WO File Naming
+
+<!-- ADAPT: Use project's slug -->
+`WO-$PROJECT_SLUG-NNN.md` in `docs/planning/`
+
+## Single Tracker
+
+All WO status tracked in `docs/planning/WO-INDEX.md`.
+- One file, one source of truth
+- No separate trackers, no parity checking
+- Update WO-INDEX.md every time a WO changes status
+
+## Commit Protocol
+
+- Reference WO number in commit messages: `feat(wo-NNN): description`
+- Run quality gates before committing: `bash scripts/gate-runner.sh pre_commit`
+- No commits without passing blocking gates

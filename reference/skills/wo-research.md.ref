@@ -1,0 +1,34 @@
+# <!-- REQUIRED -->
+# Skill: /wo-research
+
+## Description
+Launch Phase 0 research for a new Work Order. Produces dependency map, implementation plan, and test strategy.
+
+## Trigger
+User types `/wo-research` or starts a new WO with "research phase"
+
+## Behavior
+
+1. **Create WO file** from template:
+   - Generate `docs/planning/WO-$SLUG-NNN.md` from WO-TEMPLATE
+   - Set status to "Active - Phase 0"
+2. **Add to WO-INDEX.md** — new entry in Active table
+3. **Research**:
+   - Scan codebase for related modules and functions
+   - Map dependencies that will be affected
+   - Identify test coverage gaps
+   - Check for architecture rule implications
+4. **Populate WO**:
+   - Fill dependency section
+   - Fill impact analysis
+   - Draft implementation phases
+   - Draft test strategy
+5. **Run pre-check**:
+   ```bash
+   bash scripts/gate-runner.sh pre_commit --dry-run
+   ```
+6. **Report** — summary of research findings and proposed plan
+
+## Parameters
+- `title` — WO title (required)
+- `scope` — Brief scope description
