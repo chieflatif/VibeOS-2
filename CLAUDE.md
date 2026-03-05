@@ -11,7 +11,7 @@ AGENT-BOOTSTRAP.md          ← Master playbook (agent entry point)
 PROJECT-INTAKE.md            ← 18-question structured intake
 decision-engine/             ← Decision trees for setup choices
         ↓ (agent reads, decides, executes)
-scripts/                     ← 20 working gate scripts (copied to target project)
+scripts/                     ← 21 scripts: 20 gates + gate-runner (copied to target project)
 reference/                   ← Annotated examples (agent reads + adapts)
 helpers/                     ← Mechanical utilities (agent calls)
 ```

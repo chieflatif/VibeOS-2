@@ -521,8 +521,9 @@ Read reference files from `{framework_dir}/reference/governance/` and GENERATE:
 1. `{target_project_dir}/docs/planning/WO-INDEX.md` — with project name, empty WO table
 2. `{target_project_dir}/docs/planning/WO-TEMPLATE.md` — standard WO template
 3. `{target_project_dir}/docs/ADR-TEMPLATE.md` — ADR template
-4. `{target_project_dir}/docs/ARCHITECTURE.md` — with project's module structure, architecture rules
-5. `{target_project_dir}/docs/INFRASTRUCTURE-MANIFEST.md` — with sections for the project's cloud provider, database, env vars
+4. `{target_project_dir}/docs/DESIGN-DOC-TEMPLATE.md` — design document template
+5. `{target_project_dir}/docs/ARCHITECTURE.md` — with project's module structure, architecture rules
+6. `{target_project_dir}/docs/INFRASTRUCTURE-MANIFEST.md` — with sections for the project's cloud provider, database, env vars
 
 #### 5D: Generate Skill Definitions (Claude Code only)
 
@@ -624,9 +625,8 @@ IF the target project is empty/greenfield, SKIP to Phase 7.
    bash {target_project_dir}/scripts/gate-runner.sh full_audit --continue-on-failure 2>&1
 2. Parse output — count failures per gate
 3. FOR EACH gate with failures:
-   CREATE a baseline entry:
-   {
-     "gate": "<gate name>",
+   CREATE a baseline entry keyed by gate name:
+   "<gate name>": {
      "max_allowed_failures": <failure count>,
      "fail_count_pattern": "<regex to extract count from gate output>",
      "known_failing_files": ["<list of files with violations>"],
@@ -634,7 +634,7 @@ IF the target project is empty/greenfield, SKIP to Phase 7.
      "since": "<today's date>",
      "last_verified": "<today's date>"
    }
-4. Add all baselines to quality-gate-manifest.json → known_baselines.entries
+4. Add all baselines to quality-gate-manifest.json → known_baselines (keyed by gate name)
 ```
 
 #### 6D: Detect Existing Tooling
@@ -848,7 +848,7 @@ Re-run the bootstrap. It will detect existing config and ask what to update.
 
 | Directory | Contains | Agent Reads | Agent Copies |
 |---|---|---|---|
-| `scripts/` | 20 gate scripts + gate-runner | No | Yes — to target project |
+| `scripts/` | 21 scripts (20 gates + gate-runner) | No | Yes — to target project |
 | `reference/` | Annotated examples (.ref files) | Yes — for patterns | No — generates from these |
 | `decision-engine/` | Decision trees | Yes — for setup logic | No |
 | `helpers/` | Utility scripts | No — calls directly | No |
@@ -1046,11 +1046,11 @@ The manifest is the central configuration for all gates. Located at `.claude/qua
     "slug": "project-slug",
     "source_dirs": ["src/"]
   },
-  "tier_definitions": {
-    "0": "Session lifecycle — always runs automatically",
-    "1": "CRITICAL — must pass for WO completion, blocks commit/deploy",
-    "2": "IMPORTANT — should pass, blocks WO audit but allows individual commits",
-    "3": "ADVISORY — reported but never blocks"
+  "tiers": {
+    "0": { "label": "critical", "blocking": true, "description": "Session lifecycle — always runs automatically" },
+    "1": { "label": "important", "blocking": true, "description": "Must pass for WO completion, blocks commit/deploy" },
+    "2": { "label": "advisory", "blocking": false, "description": "Should pass, blocks WO audit but allows individual commits" },
+    "3": { "label": "informational", "blocking": false, "description": "Reported but never blocks" }
   },
   "phases": {
     "phase_name": {
@@ -1070,18 +1070,14 @@ The manifest is the central configuration for all gates. Located at `.claude/qua
     }
   },
   "known_baselines": {
-    "description": "Pre-existing failures that should NOT block work",
-    "entries": [
-      {
-        "gate": "Gate Name",
-        "max_allowed_failures": 0,
-        "fail_count_pattern": "([0-9]+) failed",
-        "known_failing_files": [],
-        "reason": "Why these failures are accepted",
-        "since": "2026-01-01",
-        "last_verified": "2026-01-01"
-      }
-    ]
+    "Gate Name": {
+      "max_allowed_failures": 0,
+      "fail_count_pattern": "([0-9]+) failed",
+      "known_failing_files": [],
+      "reason": "Why these failures are accepted",
+      "since": "2026-01-01",
+      "last_verified": "2026-01-01"
+    }
   }
 }
 ```
