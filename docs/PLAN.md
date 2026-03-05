@@ -1,20 +1,7 @@
 # Plan: VibeOS-2 — Self-Deploying Agent Platform
 
-## Pre-Implementation: Repo Setup
-
-```bash
-# Create private GitHub repo
-gh repo create VibeOS-2 --private --description "Self-deploying enterprise governance for AI-assisted development"
-
-# Clone to local projects directory
-cd "/Users/latifhorst/cursor projects"
-gh repo clone VibeOS-2
-
-# Copy plan file into the new repo
-cp ~/.claude/plans/misty-herding-ocean.md "/Users/latifhorst/cursor projects/VibeOS-2/docs/PLAN.md"
-```
-
-Then open `/Users/latifhorst/cursor projects/VibeOS-2/` in a new Claude Code session and start Session 1.
+> **INTERNAL BUILD DOCUMENT** — This file tracks implementation progress and source mappings.
+> It is NOT part of the distributable framework. Add to .gitignore before release.
 
 ## Context
 

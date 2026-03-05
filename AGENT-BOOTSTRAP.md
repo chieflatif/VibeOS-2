@@ -15,8 +15,15 @@ VIBEOS_VERSION="1.0.0"
 Before starting, verify these tools are available:
 
 ```
-REQUIRED: bash 3.2+, python 3.7+, git, jq
-RECOMMENDED: ruff (Python linting), pre-commit (hook management)
+REQUIRED: bash 3.2+, git, jq
+REQUIRED IF language == python: python 3.7+ (for detect-stubs-placeholders.py)
+RECOMMENDED BY LANGUAGE:
+  python:     ruff (linting), pytest (testing), pre-commit
+  typescript: eslint (linting), vitest/jest (testing), pre-commit
+  javascript: eslint (linting), jest (testing), pre-commit
+  go:         golangci-lint (linting), go test (built-in)
+  rust:       clippy (linting), cargo test (built-in)
+  java:       checkstyle (linting), junit (testing)
 ```
 
 Run `helpers/verify-prerequisites.sh` from the VibeOS-2 directory to check.
@@ -447,15 +454,65 @@ IF gate-runner fails → check manifest structure matches gate-runner expectatio
 For each selected hook:
 1. Read the corresponding .ref file from `{framework_dir}/reference/hooks/`
 2. GENERATE the hook script at `{target_project_dir}/.claude/hooks/{event_type}/{hook_name}.sh`
-3. Customize:
-   - secrets-scan.sh → set SCAN_PATTERNS for the project's language
-   - frozen-files.sh → set FROZEN_FILES from intake Q14
-   - staging-target.sh → set PRODUCTION_URLS from intake Q15
-   - governance-guard.sh → set blocked patterns based on compliance
-   - session-start.sh → set REQUIRED_DOCS, HEALTH_URL
-   - session-resume.sh → minimal customization
-   - capture-failure.sh → set EVIDENCE_DIR
-   - validate-audit-result.sh → minimal customization
+3. Customize each hook by setting variables at the top of the generated script:
+
+   **secrets-scan.sh** — set SCAN_PATTERNS array:
+   ```bash
+   SCAN_PATTERNS=(
+     'AKIA[0-9A-Z]{16}'           # AWS access key (always)
+     'ghp_[a-zA-Z0-9]{36}'        # GitHub PAT (always)
+     'sk-[a-zA-Z0-9]{48}'         # OpenAI API key (always)
+     'eyJ[a-zA-Z0-9_-]*\.eyJ'     # JWT token (always)
+     '-----BEGIN.*PRIVATE KEY'     # Private key (always)
+   )
+   # Add cloud-specific patterns:
+   # IF cloud_provider == "azure": add Azure connection strings, SAS tokens
+   # IF cloud_provider == "aws": add AWS secret keys, session tokens
+   # IF cloud_provider == "gcp": add GCP service account JSON patterns
+   ```
+
+   **frozen-files.sh** — set FROZEN_FILES array from intake Q14:
+   ```bash
+   FROZEN_FILES=(
+     # Populate from governance.frozen_files
+     # Example: "src/legacy/main.py" "config/production.json"
+   )
+   ```
+
+   **staging-target.sh** — set PRODUCTION_URLS array from intake Q15:
+   ```bash
+   PRODUCTION_URLS=(
+     # Populate from governance.production_urls
+     # Matching: exact domain match (strips protocol and path)
+     # Example: "api.myapp.com" matches "https://api.myapp.com/anything"
+   )
+   ```
+
+   **governance-guard.sh** — set BLOCKED_PATTERNS:
+   ```bash
+   BLOCKED_PATTERNS=(
+     'skip.*gate'       # Always blocked
+     'ignore.*test'     # Always blocked
+     'disable.*hook'    # Always blocked
+     'bypass.*check'    # Always blocked
+   )
+   # IF compliance != ["none"], add:
+   #   'skip.*audit' 'no.*evidence' 'force.*deploy'
+   ```
+
+   **session-start.sh** — set REQUIRED_DOCS and HEALTH_URL:
+   ```bash
+   REQUIRED_DOCS=("CLAUDE.md" "docs/planning/WO-INDEX.md")  # or .cursorrules/AGENTS.md
+   HEALTH_URL=""  # Set to first production_url + "/health" if available, else empty
+   ```
+
+   **capture-failure.sh** — set EVIDENCE_DIR:
+   ```bash
+   EVIDENCE_DIR=".claude/evidence"  # Claude Code default
+   ```
+
+   **session-resume.sh** — no project-specific customization needed.
+   **validate-audit-result.sh** — no project-specific customization needed.
 
 #### 5C: Generate Governance Documents
 
@@ -508,7 +565,7 @@ IF JSON validation fails → re-generate.
 ## PHASE 6: EXISTING PROJECT INGESTION
 
 ### CONDITION
-IF the target project has existing source code (source_dirs contain .py/.ts/.js/.go files), execute this phase.
+IF the target project has existing source code (source_dirs contain .py/.ts/.js/.go/.rs/.java files), execute this phase.
 IF the target project is empty/greenfield, SKIP to Phase 7.
 
 ### INPUT
@@ -520,22 +577,45 @@ IF the target project is empty/greenfield, SKIP to Phase 7.
 #### 6A: Scan Codebase Structure
 ```
 1. Count files by type in each source_dir
-2. Identify module/package boundaries (directories with __init__.py, package.json, go.mod)
-3. Map import graph — which modules import which
-4. Measure test coverage structure (test files that mirror source files)
+2. Identify module/package boundaries:
+   IF python: directories with __init__.py
+   IF typescript/javascript: directories with package.json or index.ts/index.js
+   IF go: directories with go.mod or *.go files
+   IF rust: directories with Cargo.toml or mod.rs
+   IF java: directories following package hierarchy (com/org/...)
+3. Map import graph — for each module, list which other modules it imports
+4. Measure test coverage structure — count test files, check if they mirror source files
 ```
 
 #### 6B: Adapt Architecture Rules
 ```
 1. Compare detected module boundaries against selected architecture rules
-2. FOR EACH rule that would produce violations:
-   IF the violation is a fundamental architectural pattern (not a mistake):
-     ADAPT the rule to match the existing pattern
-     DOCUMENT: "Adapted to match existing {project} architecture"
-   IF the violation looks like a real issue:
-     KEEP the rule as-is
-     The violation will become a baseline in 6C
-3. Update architecture-rules.json with adapted rules
+2. FOR EACH rule, run the rule against the codebase and count violations
+3. Apply this decision tree:
+
+   IF violation_count == 0:
+     KEEP rule as-is (project already follows this pattern)
+
+   IF violation_count >= 1 AND violation_count <= 5:
+     KEEP rule as-is
+     Violations become baselines in Phase 6C
+     REASON: Small number of violations suggests these are fixable issues
+
+   IF violation_count > 5 AND violation_count <= 20:
+     ASK USER: "{rule.name} has {count} existing violations. Options:
+       a) Keep rule — violations become baselines (fix over time)
+       b) Adapt rule — add exceptions for current patterns
+       c) Remove rule — not applicable to this project"
+     IF user chooses (a): keep rule, violations become baselines
+     IF user chooses (b): add exclusion patterns for violating files
+     IF user chooses (c): remove rule from architecture-rules.json
+
+   IF violation_count > 20:
+     WARN: "{rule.name} has {count} violations — this rule likely doesn't match your architecture"
+     DEFAULT: Remove rule
+     ASK USER: "Remove this rule? [Y/n]"
+
+4. Update architecture-rules.json with adapted rules
 ```
 
 #### 6C: Establish Baselines
@@ -559,18 +639,50 @@ IF the target project is empty/greenfield, SKIP to Phase 7.
 
 #### 6D: Detect Existing Tooling
 ```
-IF .ruff.toml or pyproject.toml [tool.ruff] exists:
-  NOTE: "Existing ruff config detected — validate-code-quality.sh will use it"
-IF mypy.ini or pyproject.toml [tool.mypy] exists:
-  NOTE: "Existing mypy config detected — no override needed"
-IF pytest.ini or pyproject.toml [tool.pytest] exists:
-  NOTE: "Existing pytest config detected — no override needed"
-IF .eslintrc or eslint.config.js exists:
-  NOTE: "Existing eslint config detected — validate-code-quality.sh will use it"
-IF .env exists:
-  EXTRACT variable names → populate INFRASTRUCTURE-MANIFEST.md env vars section
-IF .pre-commit-config.yaml exists:
-  MERGE new hooks with existing hooks (don't override)
+PYTHON PROJECTS:
+  IF .ruff.toml or pyproject.toml [tool.ruff] exists:
+    NOTE: "Existing ruff config — validate-code-quality.sh will use it"
+  IF mypy.ini or pyproject.toml [tool.mypy] exists:
+    NOTE: "Existing mypy config — no override needed"
+  IF pytest.ini or pyproject.toml [tool.pytest] or conftest.py exists:
+    NOTE: "Existing pytest config — no override needed"
+
+TYPESCRIPT/JAVASCRIPT PROJECTS:
+  IF .eslintrc* or eslint.config.* exists:
+    NOTE: "Existing eslint config — validate-code-quality.sh will use it"
+  IF tsconfig.json exists:
+    NOTE: "Existing TypeScript config — no override needed"
+  IF vitest.config.* or jest.config.* exists:
+    NOTE: "Existing test config — no override needed"
+
+GO PROJECTS:
+  IF .golangci.yml or .golangci.yaml exists:
+    NOTE: "Existing golangci-lint config — validate-code-quality.sh will use it"
+  IF go.mod exists:
+    NOTE: "Go modules detected"
+
+RUST PROJECTS:
+  IF Cargo.toml exists:
+    NOTE: "Cargo project detected"
+  IF clippy.toml or .clippy.toml exists:
+    NOTE: "Existing clippy config — validate-code-quality.sh will use it"
+
+JAVA PROJECTS:
+  IF pom.xml or build.gradle exists:
+    NOTE: "Build system detected"
+  IF checkstyle.xml exists:
+    NOTE: "Existing checkstyle config — validate-code-quality.sh will use it"
+
+ALL PROJECTS:
+  IF .env exists:
+    EXTRACT variable names (grep lines matching ^[A-Z_]+=)
+    POPULATE INFRASTRUCTURE-MANIFEST.md env vars table with:
+      | Variable | Purpose | Source | Required? |
+      For each extracted var, set Purpose="(auto-detected)", Source=".env", Required="TBD"
+  IF .pre-commit-config.yaml exists:
+    MERGE new hooks with existing hooks (don't override, append only)
+  IF .gitignore exists:
+    MERGE framework patterns with existing patterns
 ```
 
 ### STORE
@@ -741,3 +853,244 @@ Re-run the bootstrap. It will detect existing config and ask what to update.
 | `decision-engine/` | Decision trees | Yes — for setup logic | No |
 | `helpers/` | Utility scripts | No — calls directly | No |
 | `docs/` | Philosophy, guides | Optional reading | No |
+
+---
+
+## APPENDIX A: EVIDENCE BUNDLE FORMAT
+
+Evidence bundles are required for SOC 2 compliance. Each Work Order produces one bundle.
+
+### Directory Structure
+```
+docs/evidence/{WO_NUMBER}/
+├── summary.md          ← Human-readable: what was done, why, by whom
+├── metadata.json       ← Machine-parseable metadata
+└── gate-results/       ← Gate runner output for each phase
+    ├── pre_commit.txt
+    ├── wo_exit.txt
+    └── full_audit.txt
+```
+
+### metadata.json Schema
+```json
+{
+  "wo_number": "WO-001",
+  "title": "Work order title",
+  "status": "completed",
+  "created_date": "2026-01-15",
+  "completed_date": "2026-01-16",
+  "author": "developer name or agent",
+  "commit_sha": "abc123...",
+  "gates_run": {
+    "pre_commit": { "pass": 4, "fail": 0, "skip": 0 },
+    "wo_exit": { "pass": 8, "fail": 0, "skip": 1 },
+    "full_audit": { "pass": 15, "fail": 0, "skip": 3 }
+  },
+  "baselines_applied": 0,
+  "files_changed": ["list of files"],
+  "compliance_targets": ["SOC 2"]
+}
+```
+
+### summary.md Template
+```markdown
+# Evidence: {WO_NUMBER} — {title}
+
+## What Was Done
+(Description of changes)
+
+## Why
+(Business justification / finding that prompted this)
+
+## Testing
+(How it was verified — test results, manual checks)
+
+## Gate Results
+(Summary of gate runner output)
+
+## Sign-Off
+- Author: {name}
+- Date: {date}
+- Commit: {sha}
+```
+
+---
+
+## APPENDIX B: SETTINGS.JSON HOOK WIRING (Claude Code)
+
+Complete settings.json structure for hook wiring:
+
+```json
+{
+  "permissions": {
+    "deny": [
+      "Bash(npm publish*)",
+      "Bash(*--force*)",
+      "Bash(*rm -rf*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-tool/secrets-scan.sh $TOOL_INPUT"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-tool/frozen-files.sh $TOOL_INPUT"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-tool/staging-target.sh $TOOL_INPUT"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-tool/capture-failure.sh $TOOL_EXIT_CODE $TOOL_OUTPUT"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/user-prompt/governance-guard.sh $USER_PROMPT"
+          }
+        ]
+      }
+    ],
+    "SubagentComplete": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/subagent/validate-audit-result.sh $SUBAGENT_OUTPUT"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "SessionResume": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session/session-resume.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "TARGET_ENV": "staging"
+  }
+}
+```
+
+### Hook Exit Codes
+- `0` — allow (tool proceeds)
+- `1` — block (tool is prevented, message shown to user)
+- `2` — warn (tool proceeds but warning is logged)
+
+### Adding Production URLs to Permission Deny List
+For each URL in `governance.production_urls`, add to `permissions.deny`:
+```json
+"Bash(*{domain}*)"
+```
+Example: if production_url is "https://api.myapp.com", add `"Bash(*api.myapp.com*)"`.
+
+### Adding Frozen Files to Permission Deny List
+For each file in `governance.frozen_files`, add to `permissions.deny`:
+```json
+"Write({file_path})",
+"Edit({file_path})"
+```
+
+---
+
+## APPENDIX C: QUALITY GATE MANIFEST SCHEMA
+
+The manifest is the central configuration for all gates. Located at `.claude/quality-gate-manifest.json` (Claude Code) or `quality-gate-manifest.json` (project root).
+
+```json
+{
+  "$schema": "VibeOS-2 Quality Gate Manifest v1.0.0",
+  "version": "1.0.0",
+  "project": {
+    "name": "Project Name",
+    "slug": "project-slug",
+    "source_dirs": ["src/"]
+  },
+  "tier_definitions": {
+    "0": "Session lifecycle — always runs automatically",
+    "1": "CRITICAL — must pass for WO completion, blocks commit/deploy",
+    "2": "IMPORTANT — should pass, blocks WO audit but allows individual commits",
+    "3": "ADVISORY — reported but never blocks"
+  },
+  "phases": {
+    "phase_name": {
+      "description": "What this phase does",
+      "gates": [
+        {
+          "name": "Human-readable gate name",
+          "script": "scripts/gate-script.sh",
+          "tier": 1,
+          "blocking": true,
+          "args": ["optional", "arguments"],
+          "env": { "SCAN_DIRS": "src/" },
+          "notes": "Optional notes about this gate"
+        }
+      ],
+      "includes": ["other_phase_name"]
+    }
+  },
+  "known_baselines": {
+    "description": "Pre-existing failures that should NOT block work",
+    "entries": [
+      {
+        "gate": "Gate Name",
+        "max_allowed_failures": 0,
+        "fail_count_pattern": "([0-9]+) failed",
+        "known_failing_files": [],
+        "reason": "Why these failures are accepted",
+        "since": "2026-01-01",
+        "last_verified": "2026-01-01"
+      }
+    ]
+  }
+}
+```
+
+### Gate Runner Reads This Manifest
+The `gate-runner.sh` script:
+1. Reads the manifest
+2. Finds the requested phase
+3. Resolves `includes` (inherits gates from other phases)
+4. Runs each gate script in order
+5. Compares failures against `known_baselines`
+6. Reports: PASS (no failures), BASELINE (failures within baseline), REGRESSION (new failures)

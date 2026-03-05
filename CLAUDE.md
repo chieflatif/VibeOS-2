@@ -16,14 +16,6 @@ reference/                   ← Annotated examples (agent reads + adapts)
 helpers/                     ← Mechanical utilities (agent calls)
 ```
 
-## Source Projects
-
-This framework is extracted from two production projects:
-- **SalesSidekick** — `/Users/latifhorst/cursor projects/SalesSidekick/SalesSidekick/`
-- **Signal Intelligence Platform** — `/Users/latifhorst/cursor projects/SignalIntelligencePlatform/`
-
-When extracting scripts or patterns, read the source, understand it, then parameterize for universal use.
-
 ## Implementation Plan
 
 Full plan: `docs/PLAN.md`
@@ -36,6 +28,7 @@ Full plan: `docs/PLAN.md`
 4. **Decision engine uses decision trees** — IF/THEN/ELSE, not prose
 5. **Playbooks use INPUT/OUTPUT/STORE** — every phase declares data flow
 6. **Graceful degradation** — optional tools skip with WARNING, never crash
+7. **Language-agnostic** — every feature must work for Python, TypeScript, JavaScript, Go, Rust, Java
 
 ## Quality Gates
 
@@ -57,11 +50,10 @@ bash scripts/gate-runner.sh pre_commit --continue-on-failure
 
 | Tool | Purpose |
 |---|---|
-| Bash 4+ | Gate scripts, helpers |
-| Python 3.7+ | Stub detection, advanced validators |
-| jq | JSON template rendering, manifest parsing |
+| Bash 3.2+ | Gate scripts, helpers (macOS compatible) |
+| Python 3.7+ | Stub detection script (only dependency needing Python) |
+| jq | JSON manifest parsing |
 | git | Version control |
-| pre-commit | Hook management |
 
 ## Conventions
 

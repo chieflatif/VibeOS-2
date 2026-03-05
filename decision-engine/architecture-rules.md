@@ -252,7 +252,7 @@ IF framework == "none":
       "name": "no-raw-sql",
       "type": "forbidden_patterns",
       "source_module": "{source_dirs}",
-      "pattern": "appropriate pattern for language",
+      "pattern": "(cursor\\.execute|connection\\.execute|db\\.execute|query\\()\\s*\\(\\s*[f'\"]|(\\.execute\\s*\\(.*%s)",
       "severity": "error",
       "message": "Use parameterized queries"
     }

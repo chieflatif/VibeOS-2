@@ -58,7 +58,7 @@ if [[ $# -eq 1 ]] && [[ -f "$1" ]]; then
     if $IS_JSON; then
         # JSON template → use jq for safe rendering
         # Extract all {{KEY}} placeholders from template
-        PLACEHOLDERS=$(grep -oE '\{\{[A-Z_]+\}\}' "$TEMPLATE_FILE" | sort -u | sed 's/[{}]//g')
+        PLACEHOLDERS=$(grep -oE '\{\{[A-Za-z_][A-Za-z0-9_]*\}\}' "$TEMPLATE_FILE" | sort -u | sed 's/[{}]//g')
 
         # Start with template content
         cp "$TEMPLATE_FILE" "$OUTPUT_FILE"
@@ -82,7 +82,7 @@ if [[ $# -eq 1 ]] && [[ -f "$1" ]]; then
         done
     else
         # Non-JSON template → use sed
-        PLACEHOLDERS=$(grep -oE '\{\{[A-Z_]+\}\}' "$TEMPLATE_FILE" | sort -u | sed 's/[{}]//g')
+        PLACEHOLDERS=$(grep -oE '\{\{[A-Za-z_][A-Za-z0-9_]*\}\}' "$TEMPLATE_FILE" | sort -u | sed 's/[{}]//g')
 
         cp "$TEMPLATE_FILE" "$OUTPUT_FILE"
 
@@ -132,7 +132,7 @@ fi
 # --- VALIDATION ---
 
 # Check for remaining placeholders
-REMAINING=$(grep -oE '\{\{[A-Z_]+\}\}' "$OUTPUT_FILE" 2>/dev/null | sort -u || true)
+REMAINING=$(grep -oE '\{\{[A-Za-z_][A-Za-z0-9_]*\}\}' "$OUTPUT_FILE" 2>/dev/null | sort -u || true)
 if [[ -n "$REMAINING" ]]; then
     echo "[${SCRIPT_NAME}] WARN: Unreplaced placeholders in $OUTPUT_FILE:"
     echo "$REMAINING" | sed 's/^/  /'
