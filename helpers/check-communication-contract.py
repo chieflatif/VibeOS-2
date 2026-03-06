@@ -42,6 +42,8 @@ def main() -> int:
             "rationale",
             "Explain in Really Easy Terms",
             "Midstream Embedding",
+            "Development Plan Is the Roadmap",
+            "never asks",
         ],
     )
 

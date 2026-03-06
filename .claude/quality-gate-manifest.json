@@ -63,6 +63,12 @@
             "WO_NUMBER": "$WO_NUMBER",
             "WO_VALIDATION_MODE": "completion"
           }
+        },
+        {
+          "name": "development-plan-alignment",
+          "script": "scripts/validate-development-plan-alignment.sh",
+          "tier": 1,
+          "env": { "WO_DIR": "docs/planning" }
         }
       ]
     },

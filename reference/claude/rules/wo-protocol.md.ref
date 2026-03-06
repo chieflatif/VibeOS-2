@@ -27,6 +27,16 @@ Every Work Order file must contain:
 <!-- ADAPT: Use project's slug -->
 `WO-$PROJECT_SLUG-NNN.md` in `docs/planning/`
 
+## Development Plan (Canonical Roadmap)
+
+**docs/planning/DEVELOPMENT-PLAN.md** defines phases and ordered Work Orders. The plan is derived from the PRD and architecture.
+
+- **Determine next WO from the plan** — Read the "Next Work Order" section. That is what to build next.
+- **Never ask the user** "What work order do you want to build?" or "What do you want to do next?" — the system knows from the plan.
+- After completing a WO: (1) Mark it Complete in DEVELOPMENT-PLAN table, (2) Move to WO-INDEX Completed, (3) Set "Next" to the next pending WO. All three must stay aligned.
+- The `validate-development-plan-alignment` gate enforces alignment at wo_exit and full_audit. Fix drift before the gate will pass.
+- When starting a session, check the plan; propose the next WO: "Next up is WO-XXX (title). Shall I start?"
+
 ## Single Tracker
 
 All WO status tracked in `docs/planning/WO-INDEX.md`.

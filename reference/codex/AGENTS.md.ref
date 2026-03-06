@@ -11,6 +11,7 @@
 3. No finding without investigation
 
 ### Work Order Protocol
+- **docs/planning/DEVELOPMENT-PLAN.md** — Phased roadmap. Determines what to build next. Never ask "what do you want to build?" — use the plan.
 - Track all work in `docs/planning/WO-INDEX.md`
 - Quality gate manifest stored at `quality-gate-manifest.json`
 - Use `docs/planning/WO-AUDIT-FRAMEWORK.md` for every WO audit checkpoint

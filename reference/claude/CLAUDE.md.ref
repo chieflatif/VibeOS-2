@@ -154,7 +154,7 @@ Phase N+3: Staging Audit      → Deep self-audit after push/staging
 ```
 
 ### Single Tracker
-All WO status tracked in `docs/planning/WO-INDEX.md` (one file, no parity checking).
+**docs/planning/DEVELOPMENT-PLAN.md** defines the phased roadmap. Determine next WO from the "Next Work Order" section. Never ask the user what to build. All WO status tracked in `docs/planning/WO-INDEX.md`.
 
 ## Key Design Decisions
 

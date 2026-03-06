@@ -222,6 +222,12 @@ else
     warn "WO-INDEX.md not found at $WO_DIR/"
 fi
 
+if [[ -f "$TARGET_DIR/$WO_DIR/DEVELOPMENT-PLAN.md" ]]; then
+    pass "DEVELOPMENT-PLAN.md found"
+else
+    warn "DEVELOPMENT-PLAN.md not found at $WO_DIR/"
+fi
+
 if [[ -f "$TARGET_DIR/$WO_DIR/WO-AUDIT-FRAMEWORK.md" ]]; then
     pass "WO-AUDIT-FRAMEWORK.md found"
 else

@@ -706,7 +706,7 @@ For each selected hook:
 
    **session-start.sh** — set REQUIRED_DOCS and HEALTH_URL:
    ```bash
-   REQUIRED_DOCS=("CLAUDE.md" "docs/planning/WO-INDEX.md")  # or .cursorrules/AGENTS.md
+   REQUIRED_DOCS=("CLAUDE.md" "docs/planning/DEVELOPMENT-PLAN.md" "docs/planning/WO-INDEX.md")  # or .cursorrules/AGENTS.md
    HEALTH_URL=""  # Set to first production_url + "/health" if available, else empty
    ```
 
@@ -724,11 +724,12 @@ Read reference files from `{framework_dir}/reference/governance/` and GENERATE:
 
 1. `{target_project_dir}/docs/planning/WO-INDEX.md` — with project name, empty WO table
 2. `{target_project_dir}/docs/planning/WO-TEMPLATE.md` — standard WO template
-3. `{target_project_dir}/docs/ADR-TEMPLATE.md` — ADR template
-4. `{target_project_dir}/docs/DESIGN-DOC-TEMPLATE.md` — design document template
-5. `{target_project_dir}/docs/ARCHITECTURE.md` — with project's module structure, architecture rules
-6. `{target_project_dir}/docs/INFRASTRUCTURE-MANIFEST.md` — with sections for the project's cloud provider, database, env vars, MCP servers, and data privacy requirements (when applicable)
-7. `{target_project_dir}/docs/planning/WO-AUDIT-FRAMEWORK.md` — standard multi-pass audit questions for planning, pre-implementation, pre-commit, and staging
+3. `{target_project_dir}/docs/planning/DEVELOPMENT-PLAN.md` — **REQUIRED**: phased roadmap derived from PRD and architecture. Read `{framework_dir}/decision-engine/development-plan-generation.md` and `{framework_dir}/reference/governance/DEVELOPMENT-PLAN.md.ref`. Generate phases (Foundation, then one per core workflow, then v1 features) with ordered WOs. Set **Next Work Order** to the first pending WO. Keep plan, WO-INDEX, and WO files aligned — `validate-development-plan-alignment.sh` enforces this at wo_exit and full_audit.
+4. `{target_project_dir}/docs/ADR-TEMPLATE.md` — ADR template
+5. `{target_project_dir}/docs/DESIGN-DOC-TEMPLATE.md` — design document template
+6. `{target_project_dir}/docs/ARCHITECTURE.md` — with project's module structure, architecture rules
+7. `{target_project_dir}/docs/INFRASTRUCTURE-MANIFEST.md` — with sections for the project's cloud provider, database, env vars, MCP servers, and data privacy requirements (when applicable)
+8. `{target_project_dir}/docs/planning/WO-AUDIT-FRAMEWORK.md` — standard multi-pass audit questions for planning, pre-implementation, pre-commit, and staging
 
 Preserve and update the discovery outputs generated in Phase 0 so they remain consistent with the final technical and governance decisions.
 
@@ -762,6 +763,7 @@ Customize paths and gate names to match the project's manifest.
 - [ ] settings.json is valid JSON (Claude Code only)
 - [ ] All hook scripts are executable and pass `bash -n` syntax check
 - [ ] WO-INDEX.md exists with project name
+- [ ] DEVELOPMENT-PLAN.md exists with phases and Next Work Order set
 - [ ] WO-AUDIT-FRAMEWORK.md exists and is referenced by the WO template or agent instructions
 - [ ] INFRASTRUCTURE-MANIFEST.md exists with correct cloud provider sections
 - [ ] MCP server section is present when `agent.mcp_servers` is not `["none"]`
@@ -1022,11 +1024,13 @@ What's in {target_project_dir}:
 Known Baselines: {count} (pre-existing violations documented)
   {brief list or "None"}
 
-What you might do next (your choice):
-  • Add API keys and hosting details to docs/INFRASTRUCTURE-MANIFEST.md when you're ready
-  • Create your first Work Order — type /wo-research with a title and the agent will walk you through the full cycle
-  • Review docs/product/PRD.md and docs/TECHNICAL-SPEC.md to confirm the plan
-  • I can run a full audit or create the first WO for you — just ask
+Next Work Order: {Read from docs/planning/DEVELOPMENT-PLAN.md → "Next:" section}
+  • I'll start WO-XXX ({title}) from the development plan. Shall I begin?
+  • (Never ask "what do you want to build?" — the development plan defines the roadmap.)
+
+Other (your choice):
+  • Add API keys to docs/INFRASTRUCTURE-MANIFEST.md when ready
+  • Review docs/product/PRD.md and docs/planning/DEVELOPMENT-PLAN.md
 ```
 
 The setup summary must follow the communication contract:

@@ -176,6 +176,14 @@ When VibeOS is installed into an existing project, the agent must explain the wo
 
 Explain this loop when embedding into existing projects. Talk the user through remediation. Show what each audit found and what it means for their project.
 
+## Development Plan Is the Roadmap
+
+The agent never asks "What do you want to build?" or "What work order should we do next?"
+
+- **docs/planning/DEVELOPMENT-PLAN.md** defines phases and ordered Work Orders (derived from PRD and architecture).
+- The agent determines the next WO from the plan. It proposes: "Next up is WO-XXX (title). Shall I start?"
+- After completing a WO, the agent updates the plan and proposes the next one. No guesswork.
+
 ## No-Code Expectation
 
 VibeOS serves non-technical vibe coders. The agent runs scripts, validates the environment, and reports results — the user should never be told to "run" a command.

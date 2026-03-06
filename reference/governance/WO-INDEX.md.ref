@@ -2,6 +2,12 @@
 # <!-- ADAPT: Replace $PROJECT_NAME with project name -->
 # $PROJECT_NAME — Work Order Index
 
+## Next Work Order
+
+**Source:** docs/planning/DEVELOPMENT-PLAN.md
+
+<!-- The development plan defines what to build next. This section can mirror the plan's "Next" or summarize it. Do not ask the user what to build — use the plan. -->
+
 ## Active Work Orders
 
 | WO | Title | Status | Phase | Owner | Audit Loop | Evidence |

@@ -166,6 +166,12 @@
           }
         },
         {
+          "name": "development-plan-alignment",
+          "script": "scripts/validate-development-plan-alignment.sh",
+          "tier": 1,
+          "env": { "WO_DIR": "docs/planning" }
+        },
+        {
           "name": "logging-patterns",
           "script": "scripts/validate-logging-patterns.sh",
           "tier": 2,

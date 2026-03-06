@@ -22,10 +22,11 @@ PRE-COMMIT (4 gates — always on):
   detect-stubs-placeholders.py    tier=1  blocking=true
   validate-code-quality.sh        tier=2  blocking=true
 
-CORE (4 gates — always on):
-  validate-work-order.sh              tier=1  blocking=true
-  enforce-architecture.sh             tier=1  blocking=true
-  validate-logging-patterns.sh        tier=3  blocking=false
+CORE (5 gates — always on):
+  validate-work-order.sh                  tier=1  blocking=true
+  validate-development-plan-alignment.sh  tier=1  blocking=true  (wo_exit, full_audit)
+  enforce-architecture.sh                 tier=1  blocking=true
+  validate-logging-patterns.sh            tier=3  blocking=false
   validate-documentation-completeness.sh  tier=3  blocking=false
 
 INFRASTRUCTURE (4 gates — always on):
