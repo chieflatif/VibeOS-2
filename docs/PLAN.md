@@ -18,10 +18,12 @@
 
 ## How It Works (User Journey)
 
+**Bootstrap runs FROM the user's project folder.** User provides path to VibeOS-2.
+
 ```
-1. User clones the repo
-2. User opens their project in Claude Code / Cursor / Codex
-3. User says: "Set up enterprise governance using /path/to/enterprise-dev-framework"
+1. User clones VibeOS-2 somewhere (e.g. ~/VibeOS-2)
+2. User creates/opens their project folder in Claude Code / Cursor / Codex
+3. User says: "Set up VibeOS using ~/VibeOS-2"
 4. Agent reads AGENT-BOOTSTRAP.md (the master playbook)
 5. Agent asks 18 structured questions across 4 rounds (PROJECT-INTAKE.md)
 6. Agent makes decisions: which gates, which hooks, which rules, which phases
@@ -37,7 +39,7 @@
 
 | Pattern | Source | Why |
 |---|---|---|
-| 20 gate scripts (all working) | SIP + SS + new | Complete quality gate coverage |
+| 21 gate scripts (all working) | SIP + SS + new | Complete quality gate coverage |
 | 8 hook templates | SalesSidekick | Real-time governance (secrets, frozen files, staging safety, session lifecycle) |
 | settings.json template | SalesSidekick | Hook wiring — without this, hooks don't fire |
 | 7 gate phases | SalesSidekick | session_start → wo_entry → pre_commit → wo_exit → post_deploy → full_audit → session_end |
@@ -124,6 +126,7 @@ enterprise-dev-framework/
 │   │       ├── session-start.sh.ref
 │   │       └── session-resume.sh.ref
 │   ├── governance/
+│   │   ├── DEVELOPMENT-PLAN.md.ref   ← Phased roadmap (agent generates from PRD)
 │   │   ├── WO-INDEX.md.ref
 │   │   ├── WO-TEMPLATE.md.ref
 │   │   ├── ADR-TEMPLATE.md.ref
@@ -140,7 +143,7 @@ enterprise-dev-framework/
 │       ├── python-django.json
 │       └── typescript-node.json
 │
-├── scripts/                        ← 20 working gate scripts (agent copies these)
+├── scripts/                        ← 21 working gate scripts (agent copies these)
 │   ├── gate-runner.sh              ← Orchestrator: reads manifest, runs gates, handles baselines
 │   │
 │   ├── # Pre-commit (4)
@@ -149,9 +152,10 @@ enterprise-dev-framework/
 │   ├── detect-stubs-placeholders.py
 │   ├── validate-code-quality.sh
 │   │
-│   ├── # WO-exit (4)
+│   ├── # WO-exit (5)
 │   ├── enforce-architecture.sh      ← Config-driven rule engine (JSON rules)
 │   ├── validate-work-order.sh
+│   ├── validate-development-plan-alignment.sh  ← Plan ↔ WO-INDEX ↔ WO files; blocks on drift
 │   ├── validate-logging-patterns.sh
 │   ├── validate-documentation-completeness.sh
 │   │
@@ -180,6 +184,7 @@ enterprise-dev-framework/
 └── helpers/                        ← Mechanical utilities the agent calls
     ├── render-template.sh          ← jq for JSON, sed for markdown
     ├── verify-prerequisites.sh     ← Checks bash 3.2+, python 3.7+, git, jq
+    ├── verify-environment.sh       ← Discovers tools, GitHub, hosting (Phase 1.5)
     └── verify-setup.sh             ← Post-setup validation (all gates run, no crashes)
 ```
 
@@ -193,7 +198,7 @@ The core innovation. This is what the agent reads first. Written in agent-execut
 - INPUT: This repo's file structure
 - ACTION: Read AGENT-BOOTSTRAP.md, scan repo structure, identify agent type (Claude/Cursor/Codex)
 - STORE: Agent type, framework version, available scripts list
-- VERIFY: Agent can list all 20 gate scripts and identify its own config format
+- VERIFY: Agent can list all 21 gate scripts and identify its own config format
 
 **Phase 2: Project Intake**
 - INPUT: PROJECT-INTAKE.md questionnaire
@@ -262,7 +267,11 @@ The core innovation. This is what the agent reads first. Written in agent-execut
   3. Test hooks (Claude Code): write a test secret → verify secrets-scan catches it
   4. Generate setup summary for user: what was installed, what gates are active, what baselines exist
   5. First commit: "feat: enterprise governance framework (auto-configured)"
-- OUTPUT: Setup complete message with next steps
+- OUTPUT: Setup complete message with next steps (e.g. "Next: WO-XXX from development plan")
+
+**Invocation**: Bootstrap runs from the target project folder. User provides path to VibeOS-2. No manual "run" commands — agent executes scripts.
+
+**Midstream embedding** (existing projects): Phase 6 runs audit first → findings → WOs → implement → audit again. DEVELOPMENT-PLAN is generated from PRD; alignment gate enforces plan ↔ WO-INDEX ↔ WO files.
 
 ## PROJECT-INTAKE.md — Structured Questionnaire
 
@@ -288,8 +297,15 @@ USED_BY: architecture-rules, code-quality-gate, stub-detection, dependency-valid
 
 Located in `decision-engine/`. Each file is a decision tree the agent follows.
 
+### development-plan-generation.md
+- Generates DEVELOPMENT-PLAN.md from PRD and architecture
+- Phases: Foundation, then one per core workflow, then v1 features
+- Agent never asks "what to build?" — uses the plan
+- validate-development-plan-alignment enforces plan ↔ WO-INDEX ↔ WO files
+
 ### gate-selection.md
 ```
+ALWAYS ENABLE: validate-development-plan-alignment (wo_exit, full_audit)
 IF compliance includes "soc2":
   ENABLE: validate-evidence-bundle, validate-audit-completeness, validate-pii-handling
 IF compliance includes "owasp":
@@ -476,7 +492,7 @@ All scripts are parameterized via environment variables. The agent sets these in
 
 **Verify:**
 1. All 3 example configs produce working governance setups
-2. All 20 gates execute (pass or fail gracefully — no crashes)
+2. All 21 gates execute (pass or fail gracefully — no crashes)
 3. All 8 hooks fire correctly (Claude Code)
 4. Existing project ingestion produces correct baselines
 5. No `{{PLACEHOLDER}}` remnants in any generated files

@@ -540,7 +540,7 @@ For Cursor: no .claude/ directory. For Codex: no .claude/ directory.
 
 #### 4C: Copy Gate Scripts
 Copy each selected gate script from `{framework_dir}/scripts/` to `{target_project_dir}/scripts/`.
-Also always copy `gate-runner.sh` (the orchestrator).
+Always copy: `gate-runner.sh` (orchestrator), `validate-development-plan-alignment.sh` (enforces plan ↔ WO-INDEX alignment).
 
 #### 4D: Generate Quality Gate Manifest
 Create `{target_project_dir}/.claude/quality-gate-manifest.json` (Claude Code) or

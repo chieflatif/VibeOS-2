@@ -37,6 +37,7 @@ You don't have to adopt everything at once. Pick the tier that matches your curr
 - Code quality linting (tier 1, blocking)
 - Architecture enforcement (tier 1, blocking)
 - Work order validation (tier 1, blocking)
+- Development plan alignment (tier 1) — plan ↔ WO-INDEX ↔ WO files
 - Logging patterns (tier 2, advisory)
 - Documentation completeness (tier 2, advisory)
 
@@ -62,7 +63,7 @@ bash scripts/gate-runner.sh wo_exit --continue-on-failure
 **Additional setup:**
 1. Install hook scripts in `.claude/hooks/`
 2. Configure `settings.json` with hook wiring
-3. Set up governance templates (WO-INDEX.md, WO-TEMPLATE.md)
+3. Set up governance templates (WO-INDEX.md, WO-TEMPLATE.md, DEVELOPMENT-PLAN.md)
 4. Set up `docs/planning/WO-AUDIT-FRAMEWORK.md`
 5. Configure compliance-specific gates in manifest
 

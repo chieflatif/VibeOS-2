@@ -11,10 +11,15 @@ AGENT-BOOTSTRAP.md          ← Master playbook (agent entry point)
 PROJECT-INTAKE.md            ← 18-question structured intake
 decision-engine/             ← Decision trees for setup choices
         ↓ (agent reads, decides, executes)
-scripts/                     ← 21 scripts: 20 gates + gate-runner (copied to target project)
+scripts/                     ← 22 scripts: 21 gates + gate-runner (copied to target project)
 reference/                   ← Annotated examples (agent reads + adapts)
 helpers/                     ← Mechanical utilities (agent calls)
 ```
+
+## Key Concepts
+
+- **DEVELOPMENT-PLAN.md** — Phased roadmap with ordered Work Orders. Agent determines "what's next" from this. Plan, WO-INDEX, and WO files must stay aligned (`validate-development-plan-alignment` gate enforces).
+- **Midstream embedding** — When target has existing code: audit first, identify issues, create WOs, then implement and audit again.
 
 ## Implementation Plan
 

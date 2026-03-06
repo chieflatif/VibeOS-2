@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Added
+- **Development plan** — `DEVELOPMENT-PLAN.md` phased roadmap derived from PRD and architecture. Agent never asks "what to build?" — uses the plan. See `decision-engine/development-plan-generation.md`.
+- **validate-development-plan-alignment.sh** — Gate at wo_exit and full_audit. Ensures DEVELOPMENT-PLAN, WO-INDEX, and WO files stay aligned; blocks on drift.
+- **Midstream embedding** — Bootstrap detects existing projects, runs audit-first flow, explains audit→issues→WOs→implement→audit loop, creates WOs from findings.
+- **Environment discovery** — `helpers/verify-environment.sh` discovers tools, GitHub, hosting. Phase 1.5 presents findings, walks user through config when missing.
+- **Target-project invocation** — Bootstrap runs FROM the user's project folder; user provides path to VibeOS-2. No context switching.
+
 ### Changed
 - Stabilized the framework contract with `docs/CANONICAL-CONTRACT.md` and `docs/canonical-contract.json`.
 - Added `docs/MIGRATION.md` and compatibility support for both `.claude/quality-gate-manifest.json` and root `quality-gate-manifest.json`.
@@ -14,6 +21,8 @@
 - Aligned `helpers/verify-setup.sh` and `helpers/verify-prerequisites.sh` with the current manifest schema and documented exit codes.
 - Added framework validation helpers and compatibility fixtures for root-manifest discovery, `wo_exit` fallback, contract consistency, and dependency-version policy checks.
 - Brought governance templates into line with compliance docs by adding evidence, cloud provider, MCP, and data-privacy sections.
+- Session start REQUIRED_DOCS now includes DEVELOPMENT-PLAN.md and WO-INDEX.md.
+- validate-audit-completeness.sh now checks for DEVELOPMENT-PLAN.md and "Next Work Order" section.
 
 ## v1.0.0 (2026-03-05)
 

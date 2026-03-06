@@ -68,8 +68,8 @@
           "script": "scripts/validate-session-start.sh",
           "tier": 2,
           "env": {
-            "_comment_ADAPT": "Set REQUIRED_DOCS to project's key docs (CLAUDE.md, README.md, etc.)",
-            "REQUIRED_DOCS": "CLAUDE.md",
+            "_comment_REQUIRED": "REQUIRED_DOCS must include CLAUDE.md, docs/planning/DEVELOPMENT-PLAN.md, docs/planning/WO-INDEX.md",
+            "REQUIRED_DOCS": "CLAUDE.md docs/planning/DEVELOPMENT-PLAN.md docs/planning/WO-INDEX.md",
             "HEALTH_URL": ""
           }
         }

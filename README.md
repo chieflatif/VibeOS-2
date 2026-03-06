@@ -48,6 +48,10 @@ cd my-existing-app
 
 VibeOS configures itself from your codebase. It runs architecture reviews, dependency audits, version audits, and security audits. From those audits it identifies issues, creates Work Orders, and guides you through the audit→plan→implement→audit loop.
 
+### Development Plan (What's Next — No Guesswork)
+
+The agent never asks "what do you want to build?" It generates a **DEVELOPMENT-PLAN.md** from your PRD and architecture — phased roadmap with ordered Work Orders. That plan defines what's next. After each WO completes, the agent marks it done and sets the next one. **DEVELOPMENT-PLAN, WO-INDEX, and WO files stay aligned** — the `validate-development-plan-alignment` gate runs at wo_exit and full_audit and blocks if they drift.
+
 ## Built For Vibe Coders
 
 VibeOS is designed for people who know what they want to build, but do not necessarily know the technical stack yet.
@@ -66,14 +70,14 @@ This behavior is part of the framework, not a nice-to-have reminder.
 
 | Component | Count | Description |
 |-----------|-------|-------------|
-| Gate Scripts | 21 | Security, quality, architecture, compliance checks |
+| Gate Scripts | 22 | Security, quality, architecture, compliance, **development plan alignment** |
 | Gate Phases | Up to 10 | session_start through session_end |
 | Discovery Playbooks | 2 | Product discovery + governance bootstrap |
 | Hook Templates | 8 | Real-time guardrails (secrets, frozen files, staging safety) |
 | Agent Configs | 3 | Claude Code, Cursor, Codex |
 | Product Templates | 5 | Idea capture, product brief, PRD, technical spec, architecture outline |
-| Governance Templates | 7 | Work orders, audit framework, ADRs, design docs, architecture, infrastructure |
-| Decision Trees | 7 | Product shaping, technical recommendation, gates, phases, hooks, architecture, compliance |
+| Governance Templates | 8 | Work orders, **development plan**, audit framework, ADRs, design docs, architecture, infrastructure |
+| Decision Trees | 8 | Product shaping, technical recommendation, gates, phases, hooks, architecture, compliance, **development plan generation** |
 | Project Configs | 3 | FastAPI, Django, Express examples |
 
 ## How It Works
@@ -88,7 +92,8 @@ You open your project folder. You give the agent the path to VibeOS-2. The agent
 5. Agent selects stack, gates, phases, hooks, rules
 6. Agent copies scripts, generates configs, wires hooks — all into your project
 7. Agent scans existing code, creates architecture rules and baselines
-8. Agent verifies everything, commits, hands off — you never left your folder
+8. Agent generates DEVELOPMENT-PLAN.md (phased roadmap with ordered WOs) — defines what's next
+9. Agent verifies everything, commits, hands off — you never left your folder
 ```
 
 ## What The Agent Should Sound Like
@@ -112,16 +117,17 @@ Bad VibeOS behavior is:
 AGENT-BOOTSTRAP.md              ← Agent reads this first (Phase 0-7 playbook)
 PRODUCT-DISCOVERY.md            ← Discovery playbook for idea → definition
 PROJECT-INTAKE.md               ← Adaptive refinement questionnaire
-decision-engine/                ← Product + governance decision trees
+decision-engine/                ← Product + governance + development plan decision trees
 reference/                      ← Annotated examples (agent reads + adapts)
-scripts/                        ← 21 working gate scripts (agent copies)
+scripts/                        ← 22 working gate scripts (agent copies)
 helpers/                        ← Mechanical utilities + definition builders
 docs/product/PROJECT-IDEA.md    ← Canonical freeform idea input in generated projects
+docs/planning/DEVELOPMENT-PLAN.md ← Phased roadmap (generated); defines what's next
 docs/project-definition.schema.json ← Canonical discovery contract
 docs/                           ← Documentation + guides
 ```
 
-## Gate Scripts (21)
+## Gate Scripts (22)
 
 ### Pre-Commit (4) — Run before every commit
 - **validate-no-secrets.sh** — AWS keys, API tokens, JWTs, PEM keys
@@ -129,9 +135,10 @@ docs/                           ← Documentation + guides
 - **detect-stubs-placeholders.py** — NotImplementedError, TODO, empty functions
 - **validate-code-quality.sh** — Language-aware linting (ruff, eslint, go vet, clippy)
 
-### WO-Exit (4) — Run after completing a Work Order
+### WO-Exit (5) — Run after completing a Work Order
 - **enforce-architecture.sh** — Config-driven module boundary enforcement
 - **validate-work-order.sh** — Required WO sections
+- **validate-development-plan-alignment.sh** — Plan ↔ WO-INDEX ↔ WO files aligned; blocks on drift
 - **validate-logging-patterns.sh** — Structured logging, correlation IDs
 - **validate-documentation-completeness.sh** — Docstring coverage
 
@@ -191,6 +198,8 @@ See [docs/PROGRESSIVE-ADOPTION.md](docs/PROGRESSIVE-ADOPTION.md) for details.
 - [docs/CORE-PRINCIPLES.md](docs/CORE-PRINCIPLES.md) — Philosophy and design principles
 - [docs/PREREQUISITES.md](docs/PREREQUISITES.md) — Tool installation per OS
 - [docs/PROGRESSIVE-ADOPTION.md](docs/PROGRESSIVE-ADOPTION.md) — Pick-and-choose tiers
+- [reference/governance/DEVELOPMENT-PLAN.md.ref](reference/governance/DEVELOPMENT-PLAN.md.ref) — Development plan template
+- [decision-engine/development-plan-generation.md](decision-engine/development-plan-generation.md) — Rules for generating phased roadmap from PRD
 - [docs/agents/CLAUDE-CODE.md](docs/agents/CLAUDE-CODE.md) — Claude Code deep dive
 - [docs/agents/CURSOR.md](docs/agents/CURSOR.md) — Cursor deep dive
 - [docs/agents/CODEX.md](docs/agents/CODEX.md) — Codex deep dive

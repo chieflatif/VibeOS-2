@@ -19,7 +19,7 @@
           "name": "session-start-validation",
           "script": "scripts/validate-session-start.sh",
           "tier": 2,
-          "env": { "REQUIRED_DOCS": "CLAUDE.md README.md" }
+          "env": { "REQUIRED_DOCS": "CLAUDE.md README.md docs/planning/DEVELOPMENT-PLAN.md docs/planning/WO-INDEX.md" }
         }
       ]
     },

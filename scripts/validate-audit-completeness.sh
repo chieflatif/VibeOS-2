@@ -85,7 +85,26 @@ else
   warnings=$((warnings + 1))
 fi
 
-# Check 2: WO audit framework exists
+# Check 2: DEVELOPMENT-PLAN.md exists (required for alignment with WO-INDEX)
+DEVELOPMENT_PLAN="$wo_path/DEVELOPMENT-PLAN.md"
+if [[ -f "$DEVELOPMENT_PLAN" ]]; then
+  echo "[$GATE_NAME] PASS: DEVELOPMENT-PLAN.md found"
+  if ! grep -qE '\*\*Next:\*\*|Next Work Order' "$DEVELOPMENT_PLAN" 2>/dev/null; then
+    if [[ "$ENFORCE_AUDIT_LOOP" == "true" ]]; then
+      record_issue "error" "DEVELOPMENT-PLAN.md missing 'Next Work Order' section"
+    else
+      record_issue "warn" "DEVELOPMENT-PLAN.md should have a 'Next Work Order' section"
+    fi
+  fi
+else
+  if [[ "$ENFORCE_AUDIT_LOOP" == "true" ]]; then
+    record_issue "error" "DEVELOPMENT-PLAN.md not found — required for roadmap alignment"
+  else
+    record_issue "warn" "DEVELOPMENT-PLAN.md not found at $DEVELOPMENT_PLAN (recommended for alignment)"
+  fi
+fi
+
+# Check 3: WO audit framework exists
 WO_AUDIT_FRAMEWORK="$wo_path/WO-AUDIT-FRAMEWORK.md"
 if [[ -f "$WO_AUDIT_FRAMEWORK" ]]; then
   echo "[$GATE_NAME] PASS: WO-AUDIT-FRAMEWORK.md found"
@@ -98,7 +117,7 @@ else
   echo "[$GATE_NAME] WARN: Create a WO-AUDIT-FRAMEWORK.md to standardize repeated WO audits"
 fi
 
-# Check 3: Completed WOs have required sections
+# Check 4: Completed WOs have required sections
 if [[ -d "$wo_path" ]]; then
   completed_wo_files=$(find "$wo_path" -name "WO-*.md" -not -name "WO-INDEX.md" 2>/dev/null || true)
 
@@ -163,7 +182,7 @@ if [[ -d "$wo_path" ]]; then
   fi
 fi
 
-# Check 4: ADR directory exists (advisory)
+# Check 5: ADR directory exists (advisory)
 adr_path="$repo_root/$ADR_DIR"
 if [[ -d "$adr_path" ]]; then
   adr_count=$(find "$adr_path" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
