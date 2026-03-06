@@ -41,6 +41,7 @@ def main() -> int:
             "make a recommendation",
             "rationale",
             "Explain in Really Easy Terms",
+            "Midstream Embedding",
         ],
     )
 

@@ -15,22 +15,38 @@ A downloadable framework that any AI agent (Claude Code, Cursor, Codex) can read
 
 **This is NOT a template repo with a bash bootstrap.** The agent IS the bootstrap engine. It reads structured playbooks, asks you questions, makes decisions, and builds everything.
 
-## 60-Second Demo
+## Correct User Flow
+
+You never work inside the VibeOS-2 repo. You work in your project folder the whole time.
+
+1. Create an empty folder for your project (or open an existing one)
+2. Open **that folder** in Claude Code, Cursor, or Codex
+3. Say "Set up VibeOS" and give the path to where you cloned VibeOS-2 (e.g. `~/VibeOS-2`)
+4. Governance installs **into your current folder**
+5. You never leave this folder — everything happens in-place
+
+### Greenfield (New Project)
 
 ```bash
-# 1. Clone this repo (or open it in your agent)
-git clone https://github.com/chieflatif/VibeOS-2.git
-
-# 2. Open your project folder in Claude Code, Cursor, or Codex
-#    (Your project is the workspace — the agent works in-place.)
-
-# 3. Tell the agent what you want to build
-#    "Use VibeOS-2 to turn my idea into a PRD and governed build setup"
-
-# 4. Agent drafts a product brief + PRD + technical starting point
-# 5. Answer only the high-impact follow-up questions
-# 6. Agent builds governance, runs validation, and reports — no scripts for you to run
+mkdir my-new-app && cd my-new-app
+# Open this folder, say: "Set up VibeOS using ~/VibeOS-2"
+# Agent drafts product brief, PRD, technical spec
+# Answer high-impact follow-up questions
+# Agent installs governance into this folder
 ```
+
+### Existing Project (Midstream Embedding)
+
+```bash
+cd my-existing-app
+# Open this folder, say: "Set up VibeOS using ~/VibeOS-2"
+# Agent installs governance, runs audits (architecture, dependencies, versions, security)
+# Agent explains findings in plain English, creates Work Orders from issues
+# You run audits → identify issues → create WOs → audit the plan → implement → audit again
+# Agent talks you through remediation and how the system works
+```
+
+VibeOS configures itself from your codebase. It runs architecture reviews, dependency audits, version audits, and security audits. From those audits it identifies issues, creates Work Orders, and guides you through the audit→plan→implement→audit loop.
 
 ## Built For Vibe Coders
 
@@ -62,16 +78,17 @@ This behavior is part of the framework, not a nice-to-have reminder.
 
 ## How It Works
 
+You open your project folder. You give the agent the path to VibeOS-2. The agent reads playbooks from VibeOS-2 and installs everything into your project.
+
 ```
-1. Agent reads AGENT-BOOTSTRAP.md (master playbook)
-2. Agent runs PRODUCT-DISCOVERY.md to shape the product
-3. Agent writes `docs/product/PROJECT-IDEA.md` and builds a canonical project-definition.json
-4. Agent asks adaptive follow-up questions (PROJECT-INTAKE.md)
-5. Agent selects stack, gates, phases, hooks, rules (decision-engine/)
-6. Agent installs a blocking `wo_entry` audit gate plus the WO audit loop
-7. Agent copies scripts, generates configs, wires hooks
-8. Agent scans existing code, creates architecture rules and baselines
-9. Agent verifies everything, commits, hands off to you
+1. You open your project folder; you say "Set up VibeOS" + path to VibeOS-2
+2. Agent reads AGENT-BOOTSTRAP.md from the framework path
+3. Agent runs PRODUCT-DISCOVERY to shape the product (writes into your project)
+4. Agent asks adaptive follow-up questions (PROJECT-INTAKE)
+5. Agent selects stack, gates, phases, hooks, rules
+6. Agent copies scripts, generates configs, wires hooks — all into your project
+7. Agent scans existing code, creates architecture rules and baselines
+8. Agent verifies everything, commits, hands off — you never left your folder
 ```
 
 ## What The Agent Should Sound Like

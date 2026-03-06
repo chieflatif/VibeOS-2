@@ -4,9 +4,47 @@
 
 You are turning a rough project idea into a product definition, technical foundation, and enterprise-grade development governance setup. This playbook tells you exactly what to do, step by step. Follow every phase in order. Do not skip phases. Verify before proceeding.
 
+## INVOCATION (Do This First)
+
+**The bootstrap runs FROM the user's project folder, not from VibeOS-2.**
+
+Correct flow: (1) User creates empty project folder (or opens existing project), (2) opens it in Claude Code/Cursor/Codex, (3) says "Set up VibeOS" and gives path to VibeOS-2, (4) governance installs into current folder.
+
+1. **target_project_dir = current workspace** — The folder the user has open. All outputs go here.
+2. **framework_dir = path user provides** — Ask if needed: "Where is your VibeOS-2 folder? (e.g. ~/VibeOS-2)"
+3. **Verify:** framework_dir must contain AGENT-BOOTSTRAP.md, scripts/, reference/
+4. **Detect project mode:** Scan target for source files in common dirs (src/, lib/, app/, packages/, or project root). If any `.py`, `.ts`, `.js`, `.go`, `.rs`, `.java` files exist → **existing_project = true** (midstream embedding). Else → **existing_project = false** (greenfield).
+
+### STORE
+```json
+{
+  "framework_dir": "<path to VibeOS-2>",
+  "target_project_dir": "<current workspace>",
+  "existing_project": true | false
+}
+```
+
+### MIDSTREAM EMBEDDING (Existing Projects)
+
+When **existing_project = true**, explain this to the user before proceeding:
+
+"I'm embedding VibeOS governance into your existing project. Here's how it works:
+
+1. **Install** — I'll set up the governance framework (gates, scripts, rules) tailored to your codebase.
+2. **Audit** — I'll run architecture, dependency, version, and security audits to understand what you have.
+3. **Identify issues** — From those audits, we'll see what needs attention.
+4. **Create Work Orders** — We turn high-priority findings into Work Orders (planned fixes).
+5. **Audit the plan** — Before implementing, we audit each WO to ensure the plan is sound.
+6. **Implement** — We make the changes.
+7. **Audit again** — We verify the fix and check we didn't introduce regressions.
+
+I'll run the audits, talk you through what we find, and help you prioritize remediation. You can run audits anytime; I'll explain how the system works as we go."
+
+---
+
 ## USER COMMUNICATION CONTRACT
 
-Read `docs/USER-COMMUNICATION-CONTRACT.md` before interacting with the user.
+Read `{framework_dir}/docs/USER-COMMUNICATION-CONTRACT.md` before interacting with the user.
 
 Apply these rules throughout every phase:
 
@@ -53,28 +91,30 @@ RECOMMENDED BY LANGUAGE:
   java:       checkstyle (linting), junit (testing)
 ```
 
-Run `helpers/verify-prerequisites.sh` from the VibeOS-2 directory to check.
+Run `{framework_dir}/helpers/verify-prerequisites.sh` to check.
 
 ---
 
 ## PHASE 0: PRODUCT DISCOVERY
 
+**For existing projects:** Infer product shape from the codebase where possible (language, framework, structure). Discovery can be shorter; Phase 6 will run a full audit and identify issues. Confirm inferred answers with the user.
+
 ### INPUT
-- `PRODUCT-DISCOVERY.md`
+- `{framework_dir}/PRODUCT-DISCOVERY.md`
 - User's freeform product description
 - Optional supporting material: links, screenshots, notes, existing repo scan
 
 ### ACTION
 
-1. Read `PRODUCT-DISCOVERY.md`
+1. Read `{framework_dir}/PRODUCT-DISCOVERY.md`
 2. Capture the user's product idea in their own language before asking implementation questions
 3. Explain Phase 0 in plain English before you begin: tell the user you are turning their rough idea into a clearer product definition and plan
 4. Write the canonical freeform intent file at:
    - `{target_project_dir}/docs/product/PROJECT-IDEA.md`
-   Use `reference/product/PROJECT-IDEA.md.ref` as the pattern.
+   Use `{framework_dir}/reference/product/PROJECT-IDEA.md.ref` as the pattern.
 5. Infer a first-pass product shape using:
-   - `decision-engine/product-shaping.md`
-   - `decision-engine/technical-recommendation.md`
+   - `{framework_dir}/decision-engine/product-shaping.md`
+   - `{framework_dir}/decision-engine/technical-recommendation.md`
 6. Build a canonical `project-definition.json`
 7. Generate discovery outputs:
    - `docs/product/PRODUCT-BRIEF.md`
@@ -82,9 +122,9 @@ Run `helpers/verify-prerequisites.sh` from the VibeOS-2 directory to check.
    - `docs/TECHNICAL-SPEC.md`
    - `docs/ARCHITECTURE.md` or `docs/product/ARCHITECTURE-OUTLINE.md`
    - `docs/product/ASSUMPTIONS-AND-RISKS.md`
-8. Run:
-   - `python3 helpers/build-project-definition.py --idea-file <target_project_dir>/docs/product/PROJECT-IDEA.md --output <target_project_dir>/project-definition.json`
-   - `python3 helpers/validate-project-definition.py <target_project_dir>/project-definition.json`
+8. Run (from target project dir or with explicit paths):
+   - `python3 {framework_dir}/helpers/build-project-definition.py --idea-file {target_project_dir}/docs/product/PROJECT-IDEA.md --output {target_project_dir}/project-definition.json`
+   - `python3 {framework_dir}/helpers/validate-project-definition.py {target_project_dir}/project-definition.json`
 9. Ask adaptive follow-up questions only for missing or low-confidence/high-impact fields
 10. When asking follow-up questions, explain why the answer matters and describe options in outcome language before naming technologies
 
@@ -120,19 +160,19 @@ IF the product definition is still too vague → ask the user for one target use
 ## PHASE 1: ORIENTATION
 
 ### INPUT
-- This file (AGENT-BOOTSTRAP.md)
-- The VibeOS-2 repo directory structure
+- framework_dir and target_project_dir from INVOCATION
+- `{framework_dir}/AGENT-BOOTSTRAP.md`
 
 ### ACTION
 
-1. Confirm you are reading this file from the VibeOS-2 framework directory
+1. Confirm framework_dir and target_project_dir are set (from INVOCATION). You are running from the target project; you read playbooks from the framework.
 2. Identify your agent type:
    - IF you are Claude Code → agent_type = "claude-code"
    - IF you are Cursor/Composer → agent_type = "cursor"
    - IF you are Codex CLI → agent_type = "codex"
-3. Scan the `scripts/` directory — list all available gate scripts
-4. Scan the `reference/` directory — list all reference files for your agent type
-5. Identify the target project directory (the user's project, NOT this framework repo)
+3. Scan `{framework_dir}/scripts/` — list all available gate scripts
+4. Scan `{framework_dir}/reference/` — list all reference files for your agent type
+5. target_project_dir is already set (current workspace) — all governance installs here
 
 ### STORE
 ```json
@@ -148,13 +188,14 @@ IF the product definition is still too vague → ask the user for one target use
 
 ### VERIFY
 - [ ] agent_type is set
-- [ ] framework_dir exists and contains this file
-- [ ] target_project_dir exists and is a git repo (or will be initialized)
-- [ ] You can list at least 15 scripts in scripts/
+- [ ] framework_dir exists and contains AGENT-BOOTSTRAP.md, scripts/, reference/
+- [ ] target_project_dir is the current workspace (user's project folder)
+- [ ] You can list at least 15 scripts in {framework_dir}/scripts/
 - [ ] You can list reference files for your agent type
 
 ### ON FAILURE
-IF target_project_dir does not exist → ask user for the correct path.
+IF framework_dir is wrong or missing → ask user for the correct path to their VibeOS-2 folder.
+IF target_project_dir is not the current workspace → the user may have the wrong folder open. Ask them to open their project folder.
 IF scripts/ has fewer than 15 files → framework may be incomplete. Warn user.
 
 ---
@@ -222,14 +263,13 @@ The agent performs all script execution and environment checks. Never instruct t
 ## PHASE 2: PROJECT INTAKE
 
 ### INPUT
-- `project-definition.json` (if created in Phase 0)
-- `PRODUCT-DISCOVERY.md`
-- `PROJECT-INTAKE.md` (from this framework repo)
+- `{target_project_dir}/project-definition.json` (if created in Phase 0)
+- `{framework_dir}/PROJECT-INTAKE.md`
 - User's answers to questions
 
 ### ACTION
 
-Read `PROJECT-INTAKE.md` and refine the generated project definition across 4 rounds.
+Read `{framework_dir}/PROJECT-INTAKE.md` and refine the generated project definition across 4 rounds.
 
 Do not treat this as a blank questionnaire if `project-definition.json` already exists. Pre-fill and confirm inferred answers first, then ask only the unresolved or high-impact questions.
 
@@ -298,14 +338,14 @@ IF source_dirs don't exist → ask: "Should I create these directories?"
 ### INPUT
 - Product definition from Phase 0
 - Project config from Phase 2
-- Decision trees in `decision-engine/` directory
+- Decision trees in `{framework_dir}/decision-engine/`
 
 ### ACTION
 
 Read each decision tree file and make selections. Keep the technical recommendation and governance settings aligned with the discovery outputs.
 
 #### 3A: Select Gate Scripts
-Read `decision-engine/gate-selection.md`. Apply rules:
+Read `{framework_dir}/decision-engine/gate-selection.md`. Apply rules:
 
 ```
 ALWAYS ENABLED (4 pre-commit gates):
@@ -341,7 +381,7 @@ ALWAYS ENABLED (infrastructure):
 ```
 
 #### 3B: Select Gate Phases
-Read `decision-engine/phase-selection.md`. Apply rules:
+Read `{framework_dir}/decision-engine/phase-selection.md`. Apply rules:
 
 ```
 IF team_size == "solo":
@@ -357,7 +397,7 @@ IF team_size == "enterprise":
 `wo_exit` remains the universal user-facing audit command. If a generated manifest uses specialized `wo_exit_*` phases, `gate-runner.sh wo_exit` must still work via an explicit `wo_exit` phase or compatibility fallback.
 
 #### 3C: Select Hooks
-Read `decision-engine/hook-selection.md`. Apply rules:
+Read `{framework_dir}/decision-engine/hook-selection.md`. Apply rules:
 
 ```
 IF agent_type == "claude-code":
@@ -374,7 +414,7 @@ IF agent_type == "codex":
 ```
 
 #### 3D: Select Architecture Rules
-Read `decision-engine/architecture-rules.md`. Apply rules:
+Read `{framework_dir}/decision-engine/architecture-rules.md`. Apply rules:
 
 ```
 IF framework == "fastapi":
@@ -390,7 +430,7 @@ IF framework is other:
 ```
 
 #### 3E: Map Compliance Requirements
-Read `decision-engine/compliance-mapping.md`. Apply rules:
+Read `{framework_dir}/decision-engine/compliance-mapping.md`. Apply rules:
 
 ```
 IF compliance includes "soc2":
@@ -734,19 +774,48 @@ IF JSON validation fails → re-generate.
 
 ---
 
-## PHASE 6: EXISTING PROJECT INGESTION
+## PHASE 6: EXISTING PROJECT INGESTION (Midstream Embedding)
 
 ### CONDITION
 IF the target project has existing source code (source_dirs contain .py/.ts/.js/.go/.rs/.java files), execute this phase.
 IF the target project is empty/greenfield, SKIP to Phase 7.
 
+### PURPOSE
+
+For midstream embedding: configure governance from what exists, run audits to understand the project, identify issues, and set up the audit→issues→WOs→implement→audit loop. The agent explains findings in plain English and guides remediation.
+
 ### INPUT
 - Target project source directories
 - Selected gates and architecture rules
+- Quality gate manifest (from Phase 4)
 
 ### ACTION
 
-#### 6A: Scan Codebase Structure
+#### 6A: Run Full Audit Suite (Explain Before and After)
+
+Tell the user: "I'm running the audit suite to understand your project — architecture, dependencies, versions, and security. I'll report what I find and walk you through it."
+
+Run these gates (or equivalents from the manifest) and capture output:
+
+```bash
+# Architecture — module boundaries, rule violations
+bash {target_project_dir}/scripts/gate-runner.sh full_audit --continue-on-failure 2>&1
+# Or run individual gates: enforce-architecture, validate-dependencies, validate-dependency-versions,
+# validate-no-secrets, validate-security-patterns, validate-owasp-alignment (if enabled)
+```
+
+Parse results. Present to the user in plain English:
+
+- **Architecture** — What modules exist, what boundaries we see, any rule violations. "Your project has X modules. We found Y boundary violations — these mean [plain-English explanation]."
+- **Dependencies** — Known vulnerabilities, outdated packages. "We found N packages with known issues. The highest risk is [package] because [reason]."
+- **Versions** — Pinning, lockfile status. "Your dependencies are [pinned/floating]. I recommend [change] because [reason]."
+- **Security** — Secrets, patterns, OWASP. "We checked for hardcoded secrets and risky patterns. [Findings in plain English]."
+
+Recommend prioritization: "Here's what I suggest we tackle first: [list with rationale]. I can create Work Orders for these so we can plan and implement fixes."
+
+IF the user agrees → create Work Orders for high-priority findings. Use `/wo-research` or the WO template. Each WO addresses one category of finding (e.g. "WO-001: Remediate dependency vulnerabilities", "WO-002: Fix architecture boundary violations in api/"). Explain: "I've created WOs for the top issues. We'll audit each plan before implementing, then implement and audit again."
+
+#### 6B: Scan Codebase Structure
 ```
 1. Count files by type in each source_dir
 2. Identify module/package boundaries:
@@ -759,7 +828,7 @@ IF the target project is empty/greenfield, SKIP to Phase 7.
 4. Measure test coverage structure — count test files, check if they mirror source files
 ```
 
-#### 6B: Adapt Architecture Rules
+#### 6C: Adapt Architecture Rules
 ```
 1. Compare detected module boundaries against selected architecture rules
 2. FOR EACH rule, run the rule against the codebase and count violations
@@ -770,7 +839,7 @@ IF the target project is empty/greenfield, SKIP to Phase 7.
 
    IF violation_count >= 1 AND violation_count <= 5:
      KEEP rule as-is
-     Violations become baselines in Phase 6C
+     Violations become baselines in 6D
      REASON: Small number of violations suggests these are fixable issues
 
    IF violation_count > 5 AND violation_count <= 20:
@@ -790,7 +859,7 @@ IF the target project is empty/greenfield, SKIP to Phase 7.
 4. Update architecture-rules.json with adapted rules
 ```
 
-#### 6C: Establish Baselines
+#### 6D: Establish Baselines
 ```
 1. Run ALL selected gates against the existing codebase:
    bash {target_project_dir}/scripts/gate-runner.sh full_audit --continue-on-failure 2>&1
@@ -808,7 +877,7 @@ IF the target project is empty/greenfield, SKIP to Phase 7.
 4. Add all baselines to quality-gate-manifest.json → known_baselines (keyed by gate name)
 ```
 
-#### 6D: Detect Existing Tooling
+#### 6E: Detect Existing Tooling
 ```
 PYTHON PROJECTS:
   IF .ruff.toml or pyproject.toml [tool.ruff] exists:
@@ -859,16 +928,13 @@ ALL PROJECTS:
 ### STORE
 ```json
 {
-  "codebase_stats": {
-    "total_files": 0,
-    "files_by_type": {},
-    "modules_detected": [],
-    "test_coverage_structure": {}
-  },
-  "adapted_rules": ["<list of rules that were adapted>"],
-  "baselines": ["<list of baseline entries>"],
-  "existing_tooling": ["<list of detected tools>"],
-  "merge_notes": ["<list of integration notes>"]
+  "audit_findings": { "architecture": [], "dependencies": [], "versions": [], "security": [] },
+  "wos_created_from_findings": ["WO-001", "WO-002"],
+  "codebase_stats": { "total_files": 0, "files_by_type": {}, "modules_detected": [] },
+  "adapted_rules": [],
+  "baselines": [],
+  "existing_tooling": [],
+  "merge_notes": []
 }
 ```
 

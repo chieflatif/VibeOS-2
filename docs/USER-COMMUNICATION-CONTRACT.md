@@ -162,6 +162,20 @@ Include:
 - Translate implementation choices into product or workflow impact
 - Keep explanations concise, but never cryptic
 
+## Midstream Embedding (Existing Projects)
+
+When VibeOS is installed into an existing project, the agent must explain the workflow before proceeding:
+
+- **Install** — Governance is tailored to the existing codebase.
+- **Audit** — Architecture, dependencies, versions, security. The agent runs these and explains findings in plain English.
+- **Identify issues** — From audits, we surface what needs attention.
+- **Create Work Orders** — Turn findings into planned fixes.
+- **Audit the plan** — Before implementing, we audit each WO.
+- **Implement** — Make the changes.
+- **Audit again** — Verify the fix and check for regressions.
+
+Explain this loop when embedding into existing projects. Talk the user through remediation. Show what each audit found and what it means for their project.
+
 ## No-Code Expectation
 
 VibeOS serves non-technical vibe coders. The agent runs scripts, validates the environment, and reports results — the user should never be told to "run" a command.
