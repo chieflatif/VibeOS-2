@@ -13,9 +13,24 @@
 ### Work Order Protocol
 - All work tracked in `docs/planning/WO-INDEX.md`
 - Quality gate manifest stored at `quality-gate-manifest.json`
+- Use `docs/planning/WO-AUDIT-FRAMEWORK.md` for every WO audit checkpoint
+- Run planning self-audit before approving a WO
+- Run pre-implementation deep audit before coding starts
+- Treat plan acceptance as `Accepted - Awaiting Entry Audit`, not implementation approval
+- Run `bash scripts/gate-runner.sh wo_entry --continue-on-failure --wo <NUMBER>` before coding starts
 - Run `bash scripts/gate-runner.sh pre_commit` before committing
+- Run pre-commit deep audit before committing
 - Run `bash scripts/gate-runner.sh wo_exit` after completing a WO
+- Run staging audit after push/staging verification before moving to the next step
 - Reference WO number in commit messages: `feat(wo-NNN): description`
+
+### Communication Style
+- Assume the user may not know technical terms
+- Start with the business meaning of what just happened
+- Then explain the technical work in plain English
+- After each major step, explain what is next and why
+- Present options in outcome language first, not raw technology names
+- Do not reply with terse WO/status messages without explanation
 
 ### Zero-Stub Policy
 - No `NotImplementedError`, `pass`-only functions, empty implementations
@@ -70,6 +85,21 @@ bash scripts/gate-runner.sh wo_exit --continue-on-failure
 # Full audit
 bash scripts/gate-runner.sh full_audit --continue-on-failure
 ```
+
+### Standard Audit Questions
+- What did we miss?
+- What did we get wrong?
+- What assumptions might fail?
+- What dependencies, configs, migrations, or integrations are missing?
+- What details are invented or not backed by evidence?
+- What tests, fixtures, validations, or monitoring are missing?
+- Should an additional user-requested audit happen now?
+
+### Required Response Pattern
+- What we just achieved
+- What changed under the hood
+- Why it matters
+- Recommended next step and why
 
 ## Evidence-First
 

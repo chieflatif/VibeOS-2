@@ -431,12 +431,14 @@ for k, v in env.items():
 
   if [[ $exit_code -eq 0 ]]; then
     if printf '%s\n' "$output" | grep -q 'SKIP:'; then
-      echo "SKIP|$gate_name|$exit_code|$duration|$output"
+      echo "SKIP|$gate_name|$exit_code|$duration"
+      printf '%s\n' "$output"
     else
       echo "PASS|$gate_name|$exit_code|$duration"
     fi
   else
-    echo "FAIL|$gate_name|$exit_code|$duration|$output"
+    echo "FAIL|$gate_name|$exit_code|$duration"
+    printf '%s\n' "$output"
   fi
 
   return 0
@@ -528,8 +530,10 @@ while IFS= read -r gate_line; do
 
   # Run the gate
   result=$(run_single_gate "$gate_script" "$gate_name" "$gate_tier" "$gate_env" "$effective_timeout")
-  status=$(echo "$result" | cut -d'|' -f1)
-  duration=$(echo "$result" | cut -d'|' -f4)
+  result_header=$(printf '%s\n' "$result" | awk 'NR==1 {print; exit}')
+  gate_output=$(printf '%s\n' "$result" | awk 'NR>1 {print}')
+  status=$(printf '%s\n' "$result_header" | cut -d'|' -f1)
+  duration=$(printf '%s\n' "$result_header" | cut -d'|' -f4)
 
   gate_result="pass"
 
@@ -562,8 +566,7 @@ while IFS= read -r gate_line; do
       ;;
 
     FAIL)
-      gate_exit_code=$(echo "$result" | cut -d'|' -f3)
-      gate_output=$(echo "$result" | cut -d'|' -f5-)
+      gate_exit_code=$(printf '%s\n' "$result_header" | cut -d'|' -f3)
 
       # Check baseline
       baseline_result=$(check_baseline "$gate_name" "$gate_exit_code" "$gate_output")

@@ -1,0 +1,38 @@
+<!-- REQUIRED -->
+# {{PROJECT_NAME}} Technical Spec
+
+<!-- REQUIRED -->
+## Delivery Shape
+<!-- ADAPT -->
+- Product type: {{PRODUCT_TYPE}}
+- Platforms: {{PLATFORMS}}
+- Deployment shape: {{DEPLOYMENT_SHAPE}}
+
+<!-- REQUIRED -->
+## Recommended Stack
+<!-- ADAPT -->
+- Language: {{LANGUAGE}}
+- Framework: {{FRAMEWORK}}
+- Database: {{DATABASE}}
+- Package manager: {{PACKAGE_MANAGER}}
+
+<!-- REQUIRED -->
+## Core Modules
+<!-- ADAPT -->
+- {{MODULE_1}}
+- {{MODULE_2}}
+- {{MODULE_3}}
+
+<!-- REQUIRED -->
+## Data and Security
+<!-- ADAPT -->
+- Sensitive data: {{SENSITIVE_DATA}}
+- Compliance targets: {{COMPLIANCE_TARGETS}}
+- Audit/logging notes: {{AUDIT_REQUIREMENTS}}
+
+<!-- REQUIRED -->
+## Delivery Notes
+<!-- ADAPT -->
+- Dependency policy: {{DEPENDENCY_POLICY}}
+- Environments: {{ENVIRONMENT_SHAPE}}
+- Testing strategy: {{TEST_STRATEGY}}

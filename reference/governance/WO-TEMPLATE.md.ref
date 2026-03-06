@@ -3,6 +3,8 @@
 
 ## Status: Draft
 
+<!-- Valid states: Draft | Active - Phase 0 | Internally Audited | Presented | Accepted - Awaiting Entry Audit | Implementation Ready | Active - Phase 1 | In Progress | Complete | Shipped | Blocked -->
+
 ## Objective
 
 <!-- What problem does this solve? Why now? -->
@@ -25,6 +27,50 @@
 
 <!-- What existing functionality could be affected? -->
 
+## Audit Loop
+
+Use `docs/planning/WO-AUDIT-FRAMEWORK.md` as the standard prompt set. Every checkpoint should answer, at minimum:
+
+- What did we miss?
+- What did we get wrong?
+- What assumptions might break implementation?
+- What dependencies, integrations, migrations, or env requirements are missing?
+- What did we make up without evidence?
+- What edge cases, regressions, rollback paths, and monitoring gaps exist?
+- What tests, fixtures, or validations are still missing?
+
+### Planning Self-Audit (Required Before Approval)
+
+- Audit Status: not-started
+- Findings:
+  - <!-- Missing requirements, sequencing issues, or plan holes -->
+- Required changes to the plan:
+  - <!-- What must change before the WO can be approved -->
+
+### Pre-Implementation Deep Audit (Required Before Coding Starts)
+
+- Audit Status: not-started
+- Findings:
+  - <!-- Re-check architecture, dependencies, data flow, migrations, and tests -->
+- Entry criteria to implementation:
+  - <!-- What must be true before coding begins -->
+
+### Pre-Commit Audit (Required Before Commit)
+
+- Audit Status: not-started
+- Findings:
+  - <!-- Regressions, missed tests, invented details, or incomplete acceptance criteria -->
+- Exit criteria to commit:
+  - <!-- What must be fixed or documented before commit -->
+
+### Staging Audit (Required Before Release Closeout / Next Step)
+
+- Audit Status: not-started
+- Findings:
+  - <!-- Staging behavior, deployment/config drift, observability gaps, rollback risks -->
+- Release follow-ups:
+  - <!-- What must happen before production or before the WO is fully closed -->
+
 ## Implementation
 
 ### Phase 0: Research
@@ -32,6 +78,8 @@
 - [ ] Dependency mapping
 - [ ] Impact analysis
 - [ ] Test strategy
+- [ ] Planning self-audit completed
+- [ ] Pre-implementation deep audit completed
 
 ### Phase 1: Implementation
 
@@ -44,6 +92,8 @@
 - [ ] `bash scripts/gate-runner.sh wo_exit --continue-on-failure`
 - [ ] All blocking gates pass
 - [ ] Advisory findings documented
+- [ ] Pre-commit audit completed
+- [ ] Staging audit planned or completed
 
 ## Evidence
 
@@ -56,7 +106,7 @@
 
 ## Audit Notes
 
-<!-- REQUIRED for compliance-heavy projects: summarize gate results, baselines, and exceptions -->
+<!-- REQUIRED for compliance-heavy projects: summarize gate results, baselines, exceptions, and audit-loop findings -->
 
 ## Notes
 

@@ -37,6 +37,20 @@
         }
       ]
     },
+    "wo_entry": {
+      "gates": [
+        {
+          "name": "work-order-entry-readiness",
+          "script": "scripts/validate-work-order.sh",
+          "tier": 1,
+          "env": {
+            "WO_DIR": "docs/planning",
+            "WO_NUMBER": "$WO_NUMBER",
+            "WO_VALIDATION_MODE": "entry"
+          }
+        }
+      ]
+    },
     "wo_exit": {
       "includes": ["pre_commit"],
       "gates": [
@@ -46,7 +60,8 @@
           "tier": 1,
           "env": {
             "WO_DIR": "docs/planning",
-            "WO_NUMBER": "$WO_NUMBER"
+            "WO_NUMBER": "$WO_NUMBER",
+            "WO_VALIDATION_MODE": "completion"
           }
         }
       ]

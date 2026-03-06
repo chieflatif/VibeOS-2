@@ -8,6 +8,7 @@
 # Environment:
 #   WO_DIR    — work order directory (default: docs/planning)
 #   ADR_DIR   — ADR directory (default: docs/adr)
+#   ENFORCE_AUDIT_LOOP — true to convert required audit-loop gaps into failures
 #
 # Exit codes:
 #   0 = Audit completeness checks passed
@@ -26,10 +27,12 @@ Usage:
 Environment:
   WO_DIR    Work order directory (default: docs/planning)
   ADR_DIR   ADR directory (default: docs/adr)
+  ENFORCE_AUDIT_LOOP  true to fail on missing required audit-loop checkpoints
 
 Checks:
   - WO-INDEX.md exists and has recent entries
-  - Completed WOs have audit trail sections
+  - WO-AUDIT-FRAMEWORK.md exists
+  - Completed WOs have required audit trail checkpoints
   - ADRs reference WOs when applicable
 EOF
 }
@@ -45,10 +48,23 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WO_DIR="${WO_DIR:-docs/planning}"
 ADR_DIR="${ADR_DIR:-docs/adr}"
+ENFORCE_AUDIT_LOOP="${ENFORCE_AUDIT_LOOP:-false}"
 
 wo_path="$repo_root/$WO_DIR"
 warnings=0
 errors=0
+
+record_issue() {
+  local severity="$1"
+  local message="$2"
+  if [[ "$severity" == "error" ]]; then
+    echo "[$GATE_NAME] FAIL: $message"
+    errors=$((errors + 1))
+  else
+    echo "[$GATE_NAME] WARN: $message"
+    warnings=$((warnings + 1))
+  fi
+}
 
 # Check 1: WO-INDEX.md exists
 WO_INDEX="$wo_path/WO-INDEX.md"
@@ -69,7 +85,20 @@ else
   warnings=$((warnings + 1))
 fi
 
-# Check 2: Completed WOs have required sections
+# Check 2: WO audit framework exists
+WO_AUDIT_FRAMEWORK="$wo_path/WO-AUDIT-FRAMEWORK.md"
+if [[ -f "$WO_AUDIT_FRAMEWORK" ]]; then
+  echo "[$GATE_NAME] PASS: WO-AUDIT-FRAMEWORK.md found"
+else
+  if [[ "$ENFORCE_AUDIT_LOOP" == "true" ]]; then
+    record_issue "error" "WO-AUDIT-FRAMEWORK.md not found at $WO_AUDIT_FRAMEWORK"
+  else
+    record_issue "warn" "WO-AUDIT-FRAMEWORK.md not found at $WO_AUDIT_FRAMEWORK"
+  fi
+  echo "[$GATE_NAME] WARN: Create a WO-AUDIT-FRAMEWORK.md to standardize repeated WO audits"
+fi
+
+# Check 3: Completed WOs have required sections
 if [[ -d "$wo_path" ]]; then
   completed_wo_files=$(find "$wo_path" -name "WO-*.md" -not -name "WO-INDEX.md" 2>/dev/null || true)
 
@@ -79,28 +108,62 @@ if [[ -d "$wo_path" ]]; then
       wo_name=$(basename "$wo_file" .md)
 
       # Check for status field
-      if echo "$content" | grep -qiE '(status:\s*(complete|done|closed|shipped))'; then
-        # Completed WOs need audit sections
-        has_evidence=false
-        has_testing=false
-
-        if echo "$content" | grep -qiE '(evidence|audit|gate.*result|quality.*gate)'; then
-          has_evidence=true
-        fi
-        if echo "$content" | grep -qiE '(test|testing|verification|validated)'; then
-          has_testing=true
+      if echo "$content" | grep -qiE '(status:\s*(complete|completed|done|closed|shipped|deployed))'; then
+        if ! echo "$content" | grep -qiE 'planning self-audit'; then
+          if [[ "$ENFORCE_AUDIT_LOOP" == "true" ]]; then
+            record_issue "error" "$wo_name marked complete but missing planning self-audit checkpoint"
+          else
+            record_issue "warn" "$wo_name marked complete but missing planning self-audit checkpoint"
+          fi
         fi
 
-        if ! $has_evidence; then
-          echo "[$GATE_NAME] WARN: $wo_name marked complete but missing evidence/audit section"
-          warnings=$((warnings + 1))
+        if ! echo "$content" | grep -qiE 'pre-implementation deep audit'; then
+          if [[ "$ENFORCE_AUDIT_LOOP" == "true" ]]; then
+            record_issue "error" "$wo_name marked complete but missing pre-implementation deep audit checkpoint"
+          else
+            record_issue "warn" "$wo_name marked complete but missing pre-implementation deep audit checkpoint"
+          fi
+        fi
+
+        if ! echo "$content" | grep -qiE 'pre-commit audit'; then
+          if [[ "$ENFORCE_AUDIT_LOOP" == "true" ]]; then
+            record_issue "error" "$wo_name marked complete but missing pre-commit audit checkpoint"
+          else
+            record_issue "warn" "$wo_name marked complete but missing pre-commit audit checkpoint"
+          fi
+        fi
+
+        if ! echo "$content" | grep -qiE '(evidence|audit notes|gate.*result|quality.*gate)'; then
+          if [[ "$ENFORCE_AUDIT_LOOP" == "true" ]]; then
+            record_issue "error" "$wo_name marked complete but missing evidence or audit notes"
+          else
+            record_issue "warn" "$wo_name marked complete but missing evidence or audit notes"
+          fi
+        fi
+
+        if ! echo "$content" | grep -qiE '(test|testing|verification|validated)'; then
+          if [[ "$ENFORCE_AUDIT_LOOP" == "true" ]]; then
+            record_issue "error" "$wo_name marked complete but missing testing or verification references"
+          else
+            record_issue "warn" "$wo_name marked complete but missing testing or verification references"
+          fi
+        fi
+      fi
+
+      if echo "$content" | grep -qiE '(status:\s*(shipped|deployed))'; then
+        if ! echo "$content" | grep -qiE 'staging audit'; then
+          if [[ "$ENFORCE_AUDIT_LOOP" == "true" ]]; then
+            record_issue "error" "$wo_name marked shipped/deployed but missing staging audit checkpoint"
+          else
+            record_issue "warn" "$wo_name marked shipped/deployed but missing staging audit checkpoint"
+          fi
         fi
       fi
     done
   fi
 fi
 
-# Check 3: ADR directory exists (advisory)
+# Check 4: ADR directory exists (advisory)
 adr_path="$repo_root/$ADR_DIR"
 if [[ -d "$adr_path" ]]; then
   adr_count=$(find "$adr_path" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')

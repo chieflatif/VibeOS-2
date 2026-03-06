@@ -9,10 +9,13 @@ Cursor integration uses `.cursorrules` — a single file that embeds governance 
 The agent generates `.cursorrules` from `reference/cursor/cursorrules.ref`. This file contains:
 
 - Governance rules (Three Laws, Work Order protocol)
+- Work Order audit-loop instructions
 - Security rules (secrets, SQL injection, production URLs)
 - Architecture rules (module boundaries)
 - Quality gate commands
 - Evidence-first protocol
+
+Generated Cursor projects should also inherit the business-first communication behavior defined in `docs/USER-COMMUNICATION-CONTRACT.md`.
 
 For Cursor projects, the quality gate manifest lives at `quality-gate-manifest.json` in the project root. `gate-runner.sh` auto-discovers this path.
 
@@ -52,5 +55,7 @@ After the agent runs AGENT-BOOTSTRAP.md:
 - [ ] `.cursorrules` exists with project-specific content
 - [ ] `quality-gate-manifest.json` exists at the project root
 - [ ] `scripts/` has all gate scripts
+- [ ] `docs/planning/WO-AUDIT-FRAMEWORK.md` exists
 - [ ] `.pre-commit-config.yaml` has pre-commit hooks (compensates for no real-time hooks)
+- [ ] `gate-runner.sh wo_entry --dry-run` runs without crashes
 - [ ] `gate-runner.sh pre_commit` runs without crashes

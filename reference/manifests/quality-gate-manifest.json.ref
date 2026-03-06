@@ -12,7 +12,7 @@
 
   "_instructions": [
     "REQUIRED: The generated manifest MUST include 'version', 'project', 'tiers', and at least one phase.",
-    "ADAPT: Phase selection depends on team_size (solo=4, small=7, enterprise=10 phases).",
+    "ADAPT: Phase selection depends on team_size (solo=5, small=7, enterprise=10 phases).",
     "ADAPT: Gate selection depends on language, framework, compliance targets.",
     "ADAPT: Environment variables in gate configs must match the project's directory structure.",
     "REQUIRED: Every gate MUST have 'name', 'script', and 'tier' fields.",
@@ -118,6 +118,28 @@
       ]
     },
 
+    "wo_entry": {
+      "_comment_REQUIRED_for": "all team sizes",
+      "description": "Run after plan acceptance and before implementation starts",
+      "gates": [
+        {
+          "name": "work-order-entry-readiness",
+          "script": "scripts/validate-work-order.sh",
+          "tier": 1,
+          "env": {
+            "WO_DIR": "docs/planning",
+            "WO_NUMBER": "$WO_NUMBER",
+            "WO_VALIDATION_MODE": "entry"
+          }
+        },
+        {
+          "name": "infrastructure-manifest",
+          "script": "scripts/validate-infrastructure-manifest.sh",
+          "tier": 2
+        }
+      ]
+    },
+
     "wo_exit": {
       "_comment_REQUIRED_for": "all team sizes",
       "description": "Run after completing a Work Order — includes pre_commit + WO-specific gates",
@@ -139,7 +161,8 @@
           "tier": 1,
           "env": {
             "WO_DIR": "docs/planning",
-            "WO_NUMBER": "$WO_NUMBER"
+            "WO_NUMBER": "$WO_NUMBER",
+            "WO_VALIDATION_MODE": "completion"
           }
         },
         {
@@ -193,9 +216,10 @@
         {
           "name": "audit-completeness",
           "script": "scripts/validate-audit-completeness.sh",
-          "tier": 2,
+          "tier": 1,
           "env": {
-            "WO_DIR": "docs/planning"
+            "WO_DIR": "docs/planning",
+            "ENFORCE_AUDIT_LOOP": "true"
           }
         }
       ]

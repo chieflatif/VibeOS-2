@@ -2,11 +2,23 @@
 
 ## PURPOSE
 
-Ask the user these questions to configure their governance setup. Questions are organized in 4 rounds. Ask all questions in a round before proceeding to the next round. Use defaults when the user says "default" or doesn't have a preference.
+Refine and confirm the project definition after `PRODUCT-DISCOVERY.md` has produced a first-pass brief, PRD, and `project-definition.json`.
+
+Questions remain organized in 4 rounds, but the agent should not force the user through every question manually if a high-confidence answer already exists.
+
+## INTAKE OPERATING MODE
+
+- Read `project-definition.json` first if it exists.
+- Pre-fill answers from discovery outputs whenever confidence is medium or high.
+- Ask follow-up questions only when the answer is missing, confidence is low, or the impact is high enough to justify confirmation.
+- Present inferred defaults explicitly: "I inferred X from your product definition. Keep or change?"
+- Do not lead with implementation-detail questions if the product definition is still incomplete.
+- If a question uses technical language, explain the term briefly before asking it.
+- Frame choices in outcome language first, then introduce technology names as the implementation mapping.
 
 ## OUTPUT FORMAT
 
-Store answers as a JSON object matching the schema in AGENT-BOOTSTRAP.md Phase 2.
+Store answers as a JSON object matching the schema in `AGENT-BOOTSTRAP.md` Phase 2. Treat this as the governance/bootstrap refinement layer, not the first source of truth for product intent.
 
 ---
 
@@ -61,6 +73,7 @@ USED_BY: CLAUDE.md, documentation links
 ```
 QUESTION: What is the primary programming language?
 TYPE: choice
+AUTO_DERIVE_FIRST: yes
 OPTIONS:
   - python
   - typescript
@@ -77,6 +90,7 @@ USED_BY: architecture-rules selection, code-quality gate config, stub detection 
 ```
 QUESTION: What framework are you using?
 TYPE: choice (filtered by Q5)
+AUTO_DERIVE_FIRST: yes
 OPTIONS:
   IF python: fastapi | django | flask | none
   IF typescript: express | nestjs | nextjs | none
@@ -93,6 +107,7 @@ USED_BY: architecture-rules selection (framework-specific boundaries), architect
 ```
 QUESTION: Where is your source code? (comma-separated paths relative to project root)
 TYPE: path-list
+AUTO_DERIVE_FIRST: yes
 DEFAULT:
   IF python: "src/" or "{slug}/"
   IF typescript/javascript: "src/"
@@ -109,6 +124,7 @@ VALIDATION: paths should be relative to project root
 ```
 QUESTION: Where are your tests?
 TYPE: path
+AUTO_DERIVE_FIRST: yes
 DEFAULT:
   IF python: "tests/"
   IF typescript/javascript: "tests/" or "__tests__/" or "src/**/*.test.*"
@@ -123,6 +139,7 @@ USED_BY: test-integrity gate, documentation-completeness gate (mirror structure 
 ```
 QUESTION: What package manager do you use?
 TYPE: choice (filtered by Q5)
+AUTO_DERIVE_FIRST: yes
 OPTIONS:
   IF python: pip | poetry | uv | pdm
   IF typescript/javascript: npm | yarn | pnpm | bun
@@ -140,6 +157,7 @@ USED_BY: dependency validation gate, dependency-versions gate (registry queries)
 ```
 QUESTION: What database does your project use? (select "none" if no database)
 TYPE: choice
+AUTO_DERIVE_FIRST: yes
 OPTIONS:
   - postgresql
   - mysql
@@ -160,15 +178,16 @@ USED_BY: tenant-isolation gate (SQL scanning), architecture rules (no-raw-sql), 
 ```
 QUESTION: How many developers work on this project?
 TYPE: choice
+AUTO_DERIVE_FIRST: yes
 OPTIONS:
   - solo (just me)
   - small (2-5 developers)
   - enterprise (5+ developers)
 DEFAULT: solo
 REQUIRED: yes
-USED_BY: phase selection (solo=4 phases, small=7, enterprise=10), hook selection, governance doc templates
+USED_BY: phase selection (solo=5 phases, small=7, enterprise=10), hook selection, governance doc templates
 IMPACT:
-  solo: lighter governance — 4 gate phases, minimal hooks
+  solo: lighter governance — 5 gate phases including blocking wo_entry, minimal hooks
   small: moderate governance — 7 gate phases, session lifecycle
   enterprise: full governance — all 10 phases, all hooks, evidence bundles
 ```
@@ -177,6 +196,7 @@ IMPACT:
 ```
 QUESTION: Which compliance standards does this project target? (select all that apply, or "none")
 TYPE: multi-choice
+AUTO_DERIVE_FIRST: yes
 OPTIONS:
   - SOC 2 (audit logging, evidence bundles, access controls)
   - GDPR (PII handling, consent management, data erasure)
@@ -230,6 +250,7 @@ USED_BY: staging-target hook (blocks production commands), settings.json permiss
 ```
 QUESTION: What cloud provider does this project use? (or "none" for local-only)
 TYPE: choice
+AUTO_DERIVE_FIRST: yes
 OPTIONS:
   - azure
   - aws
@@ -245,6 +266,7 @@ USED_BY: infrastructure-manifest template (provider-specific sections), smoke-te
 ```
 QUESTION: What CI/CD platform do you use? (or "none" — gates run locally via gate-runner)
 TYPE: choice
+AUTO_DERIVE_FIRST: yes
 OPTIONS:
   - github-actions
   - gitlab-ci
@@ -260,6 +282,7 @@ NOTE: Gates always run locally via gate-runner.sh regardless of CI/CD. This answ
 ```
 QUESTION: Does your project use any MCP servers? (comma-separated names, or "none")
 TYPE: text-list
+AUTO_DERIVE_FIRST: yes
 DEFAULT: ["none"]
 REQUIRED: no
 EXAMPLE: "notion, playwright, postgres"
@@ -288,6 +311,10 @@ IF any required field is missing:
 
 IF all valid:
   Print summary of all answers.
+  Also print which fields were:
+    - user-confirmed
+    - inferred from discovery
+    - defaulted by the framework
   Ask: "Does this look correct? [Y/n]"
   IF no: ask what to change, update, re-validate.
 ```

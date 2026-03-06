@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # VibeOS-2 — Work Order Validation Gate
-# Checks that a WO file has essential sections (Objective, Acceptance Criteria, Tasks, Status).
+# Checks that a WO file has essential sections and required audit checkpoints.
 #
 # Usage:
 #   bash scripts/validate-work-order.sh <WO_NUMBER>
 #   bash scripts/validate-work-order.sh 001
 #
 # Environment:
-#   WO_DIR — directory containing work order files (default: docs/planning)
+#   WO_DIR              — directory containing work order files (default: docs/planning)
+#   WO_VALIDATION_MODE  — basic | entry | completion (default: basic)
 #
 # Exit codes:
 #   0 = All required sections present (or no WO number provided)
@@ -22,13 +23,19 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     echo "Usage: bash scripts/validate-work-order.sh <WO_NUMBER>"
     echo ""
     echo "Environment:"
-    echo "  WO_DIR  Directory containing WO files (default: docs/planning)"
+    echo "  WO_DIR              Directory containing WO files (default: docs/planning)"
+    echo "  WO_VALIDATION_MODE  basic | entry | completion (default: basic)"
     echo ""
     echo "Validates that a WO file has required sections:"
     echo "  - Objective or Scope"
     echo "  - Acceptance Criteria or Definition of Done"
     echo "  - Tasks or Phase"
     echo "  - Status field"
+    echo ""
+    echo "Validation modes:"
+    echo "  basic       Core WO structure only"
+    echo "  entry       Requires planning + pre-implementation audits complete"
+    echo "  completion  Requires planning + pre-implementation + pre-commit audits complete"
     exit 0
 fi
 
@@ -42,6 +49,7 @@ fi
 WO_NUMBER="$WO_NUMBER_INPUT"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+WO_VALIDATION_MODE="${WO_VALIDATION_MODE:-basic}"
 
 # Resolve WO directory
 WO_DIR="${WO_DIR:-docs/planning}"
@@ -75,6 +83,29 @@ echo "[$GATE_NAME] Validating: $WO_FILE"
 content=$(cat "$WO_FILE")
 errors=()
 
+section_block() {
+    local heading="$1"
+    printf '%s\n' "$content" | awk -v heading="$heading" '
+        index(tolower($0), tolower(heading)) > 0 { flag=1; next }
+        /^### / && flag { exit }
+        flag { print }
+    '
+}
+
+require_audit_complete() {
+    local heading="$1"
+    local label="$2"
+    local block
+    block="$(section_block "$heading")"
+    if [[ -z "$block" ]]; then
+        errors+=("Missing '${label}' section")
+        return
+    fi
+    if ! printf '%s\n' "$block" | grep -qiE 'Audit Status:\s*complete'; then
+        errors+=("'${label}' must have 'Audit Status: complete'")
+    fi
+}
+
 # Check 1: Objective or Scope section
 if ! echo "$content" | grep -qiE '^#{1,3}\s+(Objective|Scope|Goal)'; then
     errors+=("Missing 'Objective', 'Scope', or 'Goal' section")
@@ -95,6 +126,25 @@ if ! echo "$content" | grep -qiE '(^status:|^#{1,3}\s+Status|Status:\s+)'; then
     errors+=("Missing 'status' field")
 fi
 
+if [[ "$WO_VALIDATION_MODE" == "entry" ]]; then
+    if echo "$content" | grep -qiE '(^status:|^##\s+Status:)\s*Draft\b'; then
+        errors+=("WO must not remain in 'Draft' status when running entry validation")
+    fi
+    require_audit_complete "Planning Self-Audit" "Planning Self-Audit"
+    require_audit_complete "Pre-Implementation Deep Audit" "Pre-Implementation Deep Audit"
+fi
+
+if [[ "$WO_VALIDATION_MODE" == "completion" ]]; then
+    require_audit_complete "Planning Self-Audit" "Planning Self-Audit"
+    require_audit_complete "Pre-Implementation Deep Audit" "Pre-Implementation Deep Audit"
+    require_audit_complete "Pre-Commit Audit" "Pre-Commit Audit"
+fi
+
+if [[ "$WO_VALIDATION_MODE" != "basic" && "$WO_VALIDATION_MODE" != "entry" && "$WO_VALIDATION_MODE" != "completion" ]]; then
+    echo "[$GATE_NAME] FAIL: Unsupported WO_VALIDATION_MODE '$WO_VALIDATION_MODE'"
+    exit 2
+fi
+
 if [[ ${#errors[@]} -gt 0 ]]; then
     echo "[$GATE_NAME] FAIL: WO-${WO_NUMBER} validation failed (${#errors[@]} issue(s)):"
     for err in "${errors[@]}"; do
@@ -103,5 +153,5 @@ if [[ ${#errors[@]} -gt 0 ]]; then
     exit 1
 fi
 
-echo "[$GATE_NAME] PASS: WO-${WO_NUMBER} has all required sections"
+echo "[$GATE_NAME] PASS: WO-${WO_NUMBER} passed '$WO_VALIDATION_MODE' validation"
 exit 0

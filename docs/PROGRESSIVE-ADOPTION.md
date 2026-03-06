@@ -42,6 +42,10 @@ You don't have to adopt everything at once. Pick the tier that matches your curr
 
 **Workflow:**
 ```bash
+# After plan acceptance, before implementation
+# Run the planning and pre-implementation self-audits from docs/planning/WO-AUDIT-FRAMEWORK.md
+bash scripts/gate-runner.sh wo_entry --continue-on-failure --wo <NUMBER>
+
 # Before every commit
 bash scripts/gate-runner.sh pre_commit
 
@@ -59,7 +63,8 @@ bash scripts/gate-runner.sh wo_exit --continue-on-failure
 1. Install hook scripts in `.claude/hooks/`
 2. Configure `settings.json` with hook wiring
 3. Set up governance templates (WO-INDEX.md, WO-TEMPLATE.md)
-4. Configure compliance-specific gates in manifest
+4. Set up `docs/planning/WO-AUDIT-FRAMEWORK.md`
+5. Configure compliance-specific gates in manifest
 
 **Additional gates (selected by compliance targets):**
 - OWASP alignment (if OWASP target)

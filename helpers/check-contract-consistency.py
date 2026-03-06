@@ -13,10 +13,13 @@ REPO_ROOT = SCRIPT_DIR.parent
 
 CONTRACT_PATH = REPO_ROOT / "docs" / "canonical-contract.json"
 BOOTSTRAP_PATH = REPO_ROOT / "AGENT-BOOTSTRAP.md"
+README_PATH = REPO_ROOT / "README.md"
+PRODUCT_DISCOVERY_PATH = REPO_ROOT / "PRODUCT-DISCOVERY.md"
 PHASE_SELECTION_PATH = REPO_ROOT / "decision-engine" / "phase-selection.md"
 HOOK_SELECTION_PATH = REPO_ROOT / "decision-engine" / "hook-selection.md"
 MANIFEST_REF_PATH = REPO_ROOT / "reference" / "manifests" / "quality-gate-manifest.json.ref"
 SETTINGS_REF_PATH = REPO_ROOT / "reference" / "claude" / "settings.json.ref"
+PROJECT_IDEA_REF_PATH = REPO_ROOT / "reference" / "product" / "PROJECT-IDEA.md.ref"
 
 
 def load_json(path: Path) -> dict:
@@ -40,6 +43,7 @@ def main() -> int:
     settings_ref = load_json(SETTINGS_REF_PATH)
 
     bootstrap = BOOTSTRAP_PATH.read_text()
+    readme = README_PATH.read_text()
     phase_selection = PHASE_SELECTION_PATH.read_text()
     hook_selection = HOOK_SELECTION_PATH.read_text()
 
@@ -51,7 +55,13 @@ def main() -> int:
         require_contains(errors, bootstrap, BOOTSTRAP_PATH, manifest_path)
 
     require_contains(errors, bootstrap, BOOTSTRAP_PATH, '"wo_exit"')
+    require_contains(errors, bootstrap, BOOTSTRAP_PATH, "wo_entry")
+    require_contains(errors, bootstrap, BOOTSTRAP_PATH, "PRODUCT-DISCOVERY.md")
+    require_contains(errors, bootstrap, BOOTSTRAP_PATH, "PROJECT-IDEA.md")
+    require_contains(errors, bootstrap, BOOTSTRAP_PATH, "project-definition.json")
     require_contains(errors, phase_selection, PHASE_SELECTION_PATH, "wo_exit")
+    require_contains(errors, phase_selection, PHASE_SELECTION_PATH, "wo_entry")
+    require_contains(errors, readme, README_PATH, "PROJECT-IDEA.md")
 
     # Hook events
     hook_events = contract["hooks"]["claude_events"]
@@ -80,6 +90,14 @@ def main() -> int:
             errors.append(
                 f"{MANIFEST_REF_PATH.relative_to(REPO_ROOT)} missing canonical phase: {phase_name}"
             )
+    if "wo_entry" not in manifest_ref.get("phases", {}):
+        errors.append(
+            f"{MANIFEST_REF_PATH.relative_to(REPO_ROOT)} missing canonical phase: wo_entry"
+        )
+    if not PROJECT_IDEA_REF_PATH.exists():
+        errors.append(
+            f"missing required discovery template: {PROJECT_IDEA_REF_PATH.relative_to(REPO_ROOT)}"
+        )
 
     if errors:
         print("[check-contract-consistency] FAIL:")

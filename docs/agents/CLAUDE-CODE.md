@@ -88,12 +88,15 @@ Key sections:
 
 Claude Code skills are custom slash commands. Generated from `reference/skills/`.
 
+Generated Claude projects should also inherit the business-first communication behavior defined in `docs/USER-COMMUNICATION-CONTRACT.md`.
+
 | Skill | Command | Purpose |
 |-------|---------|---------|
 | quality-gate-check | /quality-gate-check | Run quality gates |
 | wo-complete | /wo-complete | Complete a work order |
 | post-phase-audit | /post-phase-audit | Run post-phase audit |
 | wo-research | /wo-research | Start WO Phase 0 research |
+| wo-audit | /wo-audit | Run the standard deep WO audit |
 
 ## Setup Checklist
 
@@ -106,4 +109,6 @@ After the agent runs AGENT-BOOTSTRAP.md:
 - [ ] `.claude/quality-gate-manifest.json` has phases and gates
 - [ ] `scripts/` has all gate scripts
 - [ ] `scripts/architecture-rules.json` has project-specific rules
+- [ ] `docs/planning/WO-AUDIT-FRAMEWORK.md` exists
+- [ ] `gate-runner.sh wo_entry --dry-run` runs without crashes
 - [ ] `gate-runner.sh pre_commit` runs without crashes

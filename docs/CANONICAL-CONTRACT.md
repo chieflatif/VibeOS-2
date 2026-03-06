@@ -16,6 +16,7 @@ Use this contract to keep the runtime, templates, and docs aligned while VibeOS-
 
 ### Phase Model
 
+- `wo_entry` is the blocking phase between plan acceptance and implementation.
 - `wo_exit` is the universal user-facing phase name.
 - Specialized WO phases such as `wo_exit_backend` and `wo_exit_governance` are optional extensions.
 - If a manifest does not define `wo_exit` directly, the runner may resolve it through the specialized `wo_exit_*` phases for backward compatibility.

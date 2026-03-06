@@ -2,7 +2,33 @@
 
 ## PURPOSE
 
-You are setting up enterprise-grade development governance for a project. This playbook tells you exactly what to do, step by step. Follow every phase in order. Do not skip phases. Verify before proceeding.
+You are turning a rough project idea into a product definition, technical foundation, and enterprise-grade development governance setup. This playbook tells you exactly what to do, step by step. Follow every phase in order. Do not skip phases. Verify before proceeding.
+
+## USER COMMUNICATION CONTRACT
+
+Read `docs/USER-COMMUNICATION-CONTRACT.md` before interacting with the user.
+
+Apply these rules throughout every phase:
+
+1. Start with business meaning, then explain technical detail in plain English
+2. Explain technical terms briefly the first time they matter
+3. After every major step, explain what happened, why it matters, and what happens next
+4. Present choices in outcome language first, technology language second
+5. Keep the user updated while work is in progress; do not go silent and return only with terminal-style output
+
+Required response pattern for major milestones:
+
+1. What we just achieved
+2. What changed under the hood
+3. Why it matters
+4. Recommended next step and why it comes next
+
+If the user appears non-technical or asks broad product questions:
+
+- prefer plain English over jargon
+- explain assumptions clearly
+- translate technical choices into product, speed, risk, and maintainability implications
+- never ask the user to choose between raw technologies without first explaining the business difference
 
 ## FRAMEWORK VERSION
 
@@ -27,6 +53,66 @@ RECOMMENDED BY LANGUAGE:
 ```
 
 Run `helpers/verify-prerequisites.sh` from the VibeOS-2 directory to check.
+
+---
+
+## PHASE 0: PRODUCT DISCOVERY
+
+### INPUT
+- `PRODUCT-DISCOVERY.md`
+- User's freeform product description
+- Optional supporting material: links, screenshots, notes, existing repo scan
+
+### ACTION
+
+1. Read `PRODUCT-DISCOVERY.md`
+2. Capture the user's product idea in their own language before asking implementation questions
+3. Explain Phase 0 in plain English before you begin: tell the user you are turning their rough idea into a clearer product definition and plan
+4. Write the canonical freeform intent file at:
+   - `{target_project_dir}/docs/product/PROJECT-IDEA.md`
+   Use `reference/product/PROJECT-IDEA.md.ref` as the pattern.
+5. Infer a first-pass product shape using:
+   - `decision-engine/product-shaping.md`
+   - `decision-engine/technical-recommendation.md`
+6. Build a canonical `project-definition.json`
+7. Generate discovery outputs:
+   - `docs/product/PRODUCT-BRIEF.md`
+   - `docs/product/PRD.md`
+   - `docs/TECHNICAL-SPEC.md`
+   - `docs/ARCHITECTURE.md` or `docs/product/ARCHITECTURE-OUTLINE.md`
+   - `docs/product/ASSUMPTIONS-AND-RISKS.md`
+8. Run:
+   - `python3 helpers/build-project-definition.py --idea-file <target_project_dir>/docs/product/PROJECT-IDEA.md --output <target_project_dir>/project-definition.json`
+   - `python3 helpers/validate-project-definition.py <target_project_dir>/project-definition.json`
+9. Ask adaptive follow-up questions only for missing or low-confidence/high-impact fields
+10. When asking follow-up questions, explain why the answer matters and describe options in outcome language before naming technologies
+
+### STORE
+```json
+{
+  "project_idea_path": "<target_project_dir>/docs/product/PROJECT-IDEA.md",
+  "project_definition_path": "<target_project_dir>/project-definition.json",
+  "product_outputs": [
+    "docs/product/PRODUCT-BRIEF.md",
+    "docs/product/PRD.md",
+    "docs/TECHNICAL-SPEC.md",
+    "docs/ARCHITECTURE.md",
+    "docs/product/ASSUMPTIONS-AND-RISKS.md"
+  ],
+  "discovery_confidence_gaps": ["<list of unresolved high-impact fields>"]
+}
+```
+
+### VERIFY
+- [ ] `project-definition.json` exists
+- [ ] The project definition passes `helpers/validate-project-definition.py`
+- [ ] The primary persona is defined
+- [ ] At least one core workflow is defined
+- [ ] v1 scope is defined
+- [ ] Sensitive data and compliance posture are stated
+
+### ON FAILURE
+IF the product definition is still too vague → ask the user for one target user, one core workflow, and one desired platform before continuing.
 
 ---
 
@@ -75,12 +161,18 @@ IF scripts/ has fewer than 15 files → framework may be incomplete. Warn user.
 ## PHASE 2: PROJECT INTAKE
 
 ### INPUT
+- `project-definition.json` (if created in Phase 0)
+- `PRODUCT-DISCOVERY.md`
 - `PROJECT-INTAKE.md` (from this framework repo)
 - User's answers to questions
 
 ### ACTION
 
-Read `PROJECT-INTAKE.md` and ask the user all questions across 4 rounds. Do NOT skip rounds. Do NOT assume answers — ask every required question.
+Read `PROJECT-INTAKE.md` and refine the generated project definition across 4 rounds.
+
+Do not treat this as a blank questionnaire if `project-definition.json` already exists. Pre-fill and confirm inferred answers first, then ask only the unresolved or high-impact questions.
+
+When a question is technical, explain it briefly before asking. For example, explain what a framework or package manager is in one sentence if the user has not shown that they already know.
 
 **Round 1 — Project Identity** (4 questions)
 Ask: project name, slug, description, repo URL
@@ -143,12 +235,13 @@ IF source_dirs don't exist → ask: "Should I create these directories?"
 ## PHASE 3: DECISION ENGINE
 
 ### INPUT
+- Product definition from Phase 0
 - Project config from Phase 2
 - Decision trees in `decision-engine/` directory
 
 ### ACTION
 
-Read each decision tree file and make selections:
+Read each decision tree file and make selections. Keep the technical recommendation and governance settings aligned with the discovery outputs.
 
 #### 3A: Select Gate Scripts
 Read `decision-engine/gate-selection.md`. Apply rules:
@@ -191,7 +284,7 @@ Read `decision-engine/phase-selection.md`. Apply rules:
 
 ```
 IF team_size == "solo":
-  PHASES: session_start, pre_commit, wo_exit, full_audit
+  PHASES: session_start, wo_entry, pre_commit, wo_exit, full_audit
 
 IF team_size == "small":
   PHASES: session_start, wo_entry, pre_commit, wo_exit_backend, wo_exit_governance, full_audit, session_end
@@ -299,6 +392,8 @@ Compliance: {compliance_targets}
 Proceed with this configuration? [Y/n]
 ```
 
+When presenting this summary, explain the user-facing effect of the chosen setup before listing technical details.
+
 ### ON FAILURE
 IF user says no → ask what to change, update selections, re-present summary.
 
@@ -307,6 +402,7 @@ IF user says no → ask what to change, update selections, re-present summary.
 ## PHASE 4: MECHANICAL SETUP
 
 ### INPUT
+- Product definition and discovery outputs from Phase 0
 - Selected configuration from Phase 3
 - Target project directory
 
@@ -326,7 +422,8 @@ In the target project, create:
 {target_project_dir}/
 ├── scripts/                    ← Gate scripts
 ├── docs/
-│   └── planning/               ← Work orders, ADRs
+│   ├── planning/               ← Work orders, ADRs
+│   └── product/                ← Idea capture, brief, PRD
 ├── .claude/                    ← (Claude Code only)
 │   ├── rules/
 │   │   └── always/
@@ -530,6 +627,9 @@ Read reference files from `{framework_dir}/reference/governance/` and GENERATE:
 4. `{target_project_dir}/docs/DESIGN-DOC-TEMPLATE.md` — design document template
 5. `{target_project_dir}/docs/ARCHITECTURE.md` — with project's module structure, architecture rules
 6. `{target_project_dir}/docs/INFRASTRUCTURE-MANIFEST.md` — with sections for the project's cloud provider, database, env vars, MCP servers, and data privacy requirements (when applicable)
+7. `{target_project_dir}/docs/planning/WO-AUDIT-FRAMEWORK.md` — standard multi-pass audit questions for planning, pre-implementation, pre-commit, and staging
+
+Preserve and update the discovery outputs generated in Phase 0 so they remain consistent with the final technical and governance decisions.
 
 #### 5D: Generate Skill Definitions (Claude Code only)
 
@@ -539,6 +639,7 @@ Read reference files from `{framework_dir}/reference/skills/` and GENERATE:
 2. `{target_project_dir}/.claude/skills/wo-complete.md`
 3. `{target_project_dir}/.claude/skills/post-phase-audit.md`
 4. `{target_project_dir}/.claude/skills/wo-research.md`
+5. `{target_project_dir}/.claude/skills/wo-audit.md`
 
 Customize paths and gate names to match the project's manifest.
 
@@ -560,6 +661,7 @@ Customize paths and gate names to match the project's manifest.
 - [ ] settings.json is valid JSON (Claude Code only)
 - [ ] All hook scripts are executable and pass `bash -n` syntax check
 - [ ] WO-INDEX.md exists with project name
+- [ ] WO-AUDIT-FRAMEWORK.md exists and is referenced by the WO template or agent instructions
 - [ ] INFRASTRUCTURE-MANIFEST.md exists with correct cloud provider sections
 - [ ] MCP server section is present when `agent.mcp_servers` is not `["none"]`
 - [ ] Data Privacy section is present when compliance includes `gdpr` or the project stores PII
@@ -727,7 +829,7 @@ IF failures exceed baselines → the scan miscounted. Re-scan and update baselin
 ## PHASE 7: VERIFICATION + HANDOFF
 
 ### INPUT
-- Everything from Phases 1-6
+- Everything from Phases 0-6
 - Target project with all governance files installed
 
 ### ACTION
@@ -745,10 +847,13 @@ done
 # 3. Gate runner works
 bash {target_project_dir}/scripts/gate-runner.sh pre_commit --continue-on-failure
 
-# 4. Full audit works (with baselines)
+# 4. wo_entry phase enumerates correctly
+bash {target_project_dir}/scripts/gate-runner.sh wo_entry --dry-run
+
+# 5. Full audit works (with baselines)
 bash {target_project_dir}/scripts/gate-runner.sh full_audit --continue-on-failure
 
-# 5. No placeholder remnants
+# 6. No placeholder remnants
 grep -rn '{{.*}}' {target_project_dir}/scripts/ {target_project_dir}/docs/ || echo "No placeholders"
 grep -rn '<!-- REQUIRED -->\|<!-- ADAPT' {target_project_dir}/ --include='*.md' || echo "No markers"
 ```
@@ -776,6 +881,7 @@ Files Created:
   Agent Config: {agent_config_path}
   Rules: {count} rule files
   Hooks: {count} hook scripts
+  Product Docs: {count} discovery artifacts
   Governance Docs: {count} documents
   Skills: {count} skill definitions
 
@@ -797,13 +903,21 @@ Compliance Coverage:
 
 Next Steps:
   1. Run: bash scripts/gate-runner.sh pre_commit --continue-on-failure
-  2. Create your first Work Order in docs/planning/WO-INDEX.md
-  3. Read CLAUDE.md (or .cursorrules / AGENTS.md) for governance rules
-  4. Fill in docs/INFRASTRUCTURE-MANIFEST.md with your infrastructure details
+  2. Review docs/product/PRD.md and docs/TECHNICAL-SPEC.md with the user
+  3. Review docs/planning/WO-AUDIT-FRAMEWORK.md before planning the first Work Order
+  4. Create your first Work Order in docs/planning/WO-INDEX.md
+  5. Read CLAUDE.md (or .cursorrules / AGENTS.md) for governance rules
+  6. Fill in docs/INFRASTRUCTURE-MANIFEST.md with your infrastructure details
 
 To update VibeOS-2 later:
   Re-run this bootstrap — it will preserve your config and update scripts.
 ```
+
+The setup summary must follow the communication contract:
+
+- business-level summary first
+- technical explanation second
+- next steps with reasoning last
 
 #### 7D: Commit (if user approves)
 ```
@@ -856,11 +970,12 @@ Re-run the bootstrap. It will detect existing config and ask what to update.
 
 | Directory | Contains | Agent Reads | Agent Copies |
 |---|---|---|---|
+| `PRODUCT-DISCOVERY.md` | Discovery playbook | Yes | No |
 | `scripts/` | 21 scripts (20 gates + gate-runner) | No | Yes — to target project |
 | `reference/` | Annotated examples (.ref files) | Yes — for patterns | No — generates from these |
-| `decision-engine/` | Decision trees | Yes — for setup logic | No |
-| `helpers/` | Utility scripts | No — calls directly | No |
-| `docs/` | Philosophy, guides | Optional reading | No |
+| `decision-engine/` | Product + governance decision trees | Yes — for setup logic | No |
+| `helpers/` | Utility scripts and project-definition builders | No — calls directly | No |
+| `docs/` | Philosophy, guides, schemas | Optional reading | No |
 
 ---
 

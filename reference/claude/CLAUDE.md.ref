@@ -57,11 +57,23 @@ src/
 2. No Work Order without an evidence-backed finding
 3. No finding without investigation
 
+### Communication Style
+<!-- REQUIRED -->
+- Assume the user may be non-technical unless they clearly show otherwise
+- Start with a short executive or business summary before technical detail
+- Explain technical terms briefly the first time they appear
+- After each major step, explain what happened, why it matters, and what happens next
+- Present options in outcome language first, then map them to technologies
+- Do not sound like a terminal log or dump unexplained jargon
+
 ### Quality Gates
 
 <!-- ADAPT: Agent lists active phases from quality-gate-manifest.json -->
 
 ```bash
+# After plan acceptance, before implementation
+bash scripts/gate-runner.sh wo_entry --continue-on-failure --wo <NUMBER>
+
 # Before every commit
 bash scripts/gate-runner.sh pre_commit --continue-on-failure
 
@@ -71,6 +83,33 @@ bash scripts/gate-runner.sh wo_exit --continue-on-failure
 # Comprehensive audit
 bash scripts/gate-runner.sh full_audit --continue-on-failure
 ```
+
+### Audit Loop
+
+Before moving a Work Order forward, run the matching deep self-audit using `docs/planning/WO-AUDIT-FRAMEWORK.md`:
+
+- Planning self-audit before WO approval
+- Pre-implementation deep audit before coding
+- Pre-commit audit before commit
+- Staging audit after push/staging verification
+- Plan acceptance should move the WO to `Accepted - Awaiting Entry Audit`
+- Do not start implementation until `wo_entry` passes
+
+Always record:
+- what was missed
+- what was wrong
+- what assumptions remain risky
+- what dependencies or tests are missing
+- whether an additional user-requested audit is recommended
+
+### Required Response Pattern
+
+For setup milestones, WO planning, implementation updates, audits, and WO completion, respond in this order:
+
+1. What we just achieved
+2. What changed under the hood
+3. Why it matters
+4. Recommended next step and why
 
 ### Quality Gates (source of truth: `.claude/quality-gate-manifest.json`)
 
@@ -100,10 +139,16 @@ pre-commit install
 
 <!-- REQUIRED -->
 ```
-Phase 0: Research    → Dependencies, impact analysis, test plan
-Phase 1+: Implement  → Code + tests
-Phase N: Audit       → gate-runner.sh wo_exit
-Phase N+1: Commit    → Only if gates pass
+Phase 0: Research             → Dependencies, impact analysis, test plan
+Phase 0A: Planning Audit      → Deep self-audit before approval
+Phase 0B: Plan Accepted       → Accepted - Awaiting Entry Audit
+Phase 0C: Entry Gate          → gate-runner.sh wo_entry
+Phase 0D: Pre-Impl Audit      → Deep self-audit before coding
+Phase 1+: Implement           → Code + tests
+Phase N: Pre-Commit Audit     → Deep self-audit before commit
+Phase N+1: Gate Audit         → gate-runner.sh wo_exit
+Phase N+2: Commit             → Only if audits + gates pass
+Phase N+3: Staging Audit      → Deep self-audit after push/staging
 ```
 
 ### Single Tracker

@@ -37,12 +37,12 @@ session_end       tier=0  "Run at session end — summary, uncommitted check"
 IF team_size == "solo":
   ENABLE PHASES:
     session_start        ← light: env check only
+    wo_entry             ← required: accepted plan must pass entry audit before coding
     pre_commit           ← always: fast gates on every commit
     wo_exit              ← combined: no backend/frontend split
     full_audit           ← on-demand: comprehensive check
 
   DISABLE PHASES:
-    wo_entry             ← overhead for solo: skip
     wo_exit_backend      ← merged into wo_exit
     wo_exit_frontend     ← merged into wo_exit
     wo_exit_crosscutting ← merged into wo_exit
@@ -104,7 +104,7 @@ session_start:
   - validate-session-start.sh
 
 wo_entry:
-  - validate-work-order.sh
+  - validate-work-order.sh (entry mode)
   - validate-infrastructure-manifest.sh
 
 pre_commit:
@@ -128,7 +128,7 @@ wo_exit_crosscutting:
   includes: [wo_exit_backend, wo_exit_frontend]
 
 wo_exit_governance:
-  - validate-work-order.sh (verify WO is complete)
+  - validate-audit-completeness.sh (strict audit-loop enforcement)
   - validate-no-secrets.sh
   - detect-stubs-placeholders.py
   - validate-evidence-bundle.sh (IF compliance includes soc2)

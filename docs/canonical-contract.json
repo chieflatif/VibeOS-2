@@ -11,6 +11,7 @@
   "phases": {
     "user_facing": [
       "session_start",
+      "wo_entry",
       "pre_commit",
       "wo_exit",
       "full_audit",

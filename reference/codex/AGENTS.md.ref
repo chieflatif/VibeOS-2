@@ -13,9 +13,24 @@
 ### Work Order Protocol
 - Track all work in `docs/planning/WO-INDEX.md`
 - Quality gate manifest stored at `quality-gate-manifest.json`
+- Use `docs/planning/WO-AUDIT-FRAMEWORK.md` for every WO audit checkpoint
+- Run planning self-audit before approving a WO
+- Run pre-implementation deep audit before coding starts
+- Treat plan acceptance as `Accepted - Awaiting Entry Audit`, not implementation approval
+- Run `bash scripts/gate-runner.sh wo_entry --continue-on-failure --wo <NUMBER>` before coding starts
 - Run `bash scripts/gate-runner.sh pre_commit` before every commit
+- Run pre-commit deep audit before commit
 - Run `bash scripts/gate-runner.sh wo_exit` after completing a Work Order
+- Run staging audit after push/staging verification before moving on
 - Use commit format: `feat(wo-NNN): description`
+
+### Communication Style
+- Assume the user may not know technical terms
+- Start with the business meaning of what just happened
+- Then explain the technical work in plain English
+- After each major step, explain what is next and why
+- Present options in outcome language first, not raw technology names
+- Do not reply with terse WO/status messages without explanation
 
 ### Zero-Stub Policy
 No stubs, placeholders, or TODO comments in committed code. If something cannot be fully implemented, document the blocker in the Work Order.
@@ -47,6 +62,23 @@ bash scripts/gate-runner.sh pre_commit --continue-on-failure
 bash scripts/gate-runner.sh wo_exit --continue-on-failure
 bash scripts/gate-runner.sh full_audit --continue-on-failure
 ```
+
+## Standard Audit Questions
+
+- What did we miss?
+- What did we get wrong?
+- What assumptions might fail?
+- What dependencies, configs, migrations, or integrations are missing?
+- What details are invented or not backed by evidence?
+- What tests, fixtures, validations, or monitoring are missing?
+- Should an additional user-requested audit happen now?
+
+## Required Response Pattern
+
+1. What we just achieved
+2. What changed under the hood
+3. Why it matters
+4. Recommended next step and why
 
 ## Development
 

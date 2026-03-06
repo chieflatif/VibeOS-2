@@ -9,17 +9,30 @@ User types `/post-phase-audit` or after completing a significant implementation 
 
 ## Behavior
 
-1. **Run full_audit gates**:
+1. **Run the deep audit framework first**:
+   - Read `docs/planning/WO-AUDIT-FRAMEWORK.md`
+   - Re-run the standard questions for the requested checkpoint
+   - Record what was missed, what was wrong, what was assumed, and what still lacks evidence
+2. **Run full_audit gates**:
    ```bash
    bash scripts/gate-runner.sh full_audit --continue-on-failure --json
    ```
-2. **Parse JSON results** — categorize by tier and severity
-3. **Generate audit report**:
+3. **Parse JSON results** — categorize by tier and severity
+4. **Generate audit report**:
    - Blocking issues (must fix before proceeding)
    - Advisory issues (document, fix when practical)
    - Baselined issues (pre-existing, tracked in manifest)
-4. **Compare with previous audit** — identify regressions vs improvements
-5. **Update WO** — add audit findings to current work order
+5. **Compare with previous audit** — identify regressions vs improvements
+6. **Update WO** — add audit findings to current work order
+7. **Prompt for an extra user-initiated audit** when:
+   - there are unresolved blocking issues
+   - confidence is still low
+   - staging or deployment risk remains high
+8. **Report back using this structure**
+   - Executive summary: what the audit means for the project in plain English
+   - Technical explanation: what was checked and what failed or passed
+   - Risk view: what must stop progress vs what is advisory
+   - Recommended next step: what should happen next and why
 
 ## Parameters
 - `--wo NUMBER` — Associate audit with a specific WO

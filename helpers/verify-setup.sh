@@ -222,6 +222,12 @@ else
     warn "WO-INDEX.md not found at $WO_DIR/"
 fi
 
+if [[ -f "$TARGET_DIR/$WO_DIR/WO-AUDIT-FRAMEWORK.md" ]]; then
+    pass "WO-AUDIT-FRAMEWORK.md found"
+else
+    warn "WO-AUDIT-FRAMEWORK.md not found at $WO_DIR/"
+fi
+
 if [[ -f "$TARGET_DIR/docs/INFRASTRUCTURE-MANIFEST.md" ]]; then
     pass "INFRASTRUCTURE-MANIFEST.md found"
 else
@@ -285,6 +291,13 @@ if [[ -f "$TARGET_DIR/scripts/gate-runner.sh" ]] && $MANIFEST_FOUND; then
         warn "gate-runner.sh dry run produced errors (may need manifest adjustments)"
     else
         pass "gate-runner.sh dry run completed"
+    fi
+
+    WO_ENTRY_OUTPUT=$(cd "$TARGET_DIR" && bash scripts/gate-runner.sh wo_entry --dry-run 2>&1 || true)
+    if echo "$WO_ENTRY_OUTPUT" | grep -qi "error\|fatal\|cannot"; then
+        warn "gate-runner.sh wo_entry dry run produced errors (entry phase may need manifest adjustments)"
+    else
+        pass "gate-runner.sh wo_entry dry run completed"
     fi
 else
     warn "Skipping gate-runner smoke test (missing gate-runner.sh or manifest)"

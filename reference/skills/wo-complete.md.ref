@@ -10,21 +10,32 @@ User types `/wo-complete` or says "complete WO-NNN"
 ## Behavior
 
 1. **Identify the WO** — from argument or current context
-2. **Run wo_exit gates**:
+2. **Run pre-commit deep audit** using `docs/planning/WO-AUDIT-FRAMEWORK.md`:
+   - What did we miss?
+   - What did we get wrong?
+   - What dependencies, tests, edge cases, or invented details remain?
+   - Should an additional user-requested audit happen before commit?
+3. **Run wo_exit gates**:
    ```bash
    bash scripts/gate-runner.sh wo_exit --continue-on-failure --wo <NUMBER>
    ```
-3. **Check results**:
+4. **Check results**:
    - If blocking failures: report them, do NOT proceed
    - If only advisory failures: note them, proceed
-4. **Update WO file** — mark status as Complete, add audit results
-5. **Update WO-INDEX.md** — move entry to Completed table
-6. **Stage and commit**:
+5. **Update WO file** — mark status as Complete, add audit results and pre-commit audit findings
+6. **Update WO-INDEX.md** — move entry to Completed table
+7. **Stage and commit**:
    ```bash
    git add <changed files>
    git commit -m "feat(wo-<NUMBER>): <WO title>"
    ```
-7. **Report** — summary of what was completed
+8. **Recommend staging audit**
+   - Prompt for a final staging audit after push if the work is user-facing, risky, or still has open assumptions
+9. **Report** — use this response pattern:
+   - Executive summary: what the business or product outcome was
+   - Technical summary: what changed under the hood, in plain English
+   - Why it matters: quality, risk, speed, or user impact
+   - Recommended next step: staging audit, release follow-up, or next WO, with reasoning
 
 ## Parameters
 - `wo` — Work order number (required)

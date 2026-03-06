@@ -4,10 +4,14 @@
 ## Work Order Lifecycle
 
 ```
-Phase 0: Research    → Dependencies, impact analysis, test plan
-Phase 1+: Implement  → Code + tests per phase
-Phase N: Audit       → gate-runner.sh wo_exit
-Phase N+1: Commit    → Only if gates pass
+Phase 0: Research             → Dependencies, impact analysis, test plan
+Phase 0A: Planning Audit      → Deep self-audit before approval
+Phase 0B: Pre-Impl Audit      → Deep self-audit before coding starts
+Phase 1+: Implement           → Code + tests per phase
+Phase N: Pre-Commit Audit     → Deep self-audit before commit
+Phase N+1: Gate Audit         → gate-runner.sh wo_exit
+Phase N+2: Commit             → Only if audits + gates pass
+Phase N+3: Staging Audit      → Deep self-audit after push/staging before next step
 ```
 
 ## Required WO Sections
@@ -16,7 +20,7 @@ Every Work Order file must contain:
 1. **Objective** — What and why
 2. **Acceptance Criteria** — Definition of done
 3. **Tasks/Phases** — Implementation breakdown
-4. **Status** — Current state (Draft/Active/Complete/Blocked)
+4. **Status** — Current state (`Draft` → `Active - Phase 0` → `Internally Audited` → `Presented` → `Accepted - Awaiting Entry Audit` → `Implementation Ready` → `Active - Phase 1`/`In Progress` → `Complete`/`Shipped`/`Blocked`)
 
 ## WO File Naming
 
@@ -34,4 +38,7 @@ All WO status tracked in `docs/planning/WO-INDEX.md`.
 
 - Reference WO number in commit messages: `feat(wo-NNN): description`
 - Run quality gates before committing: `bash scripts/gate-runner.sh pre_commit`
+- Run the blocking entry audit before implementation starts: `bash scripts/gate-runner.sh wo_entry --continue-on-failure --wo <NUMBER>`
 - No commits without passing blocking gates
+- No implementation start without the planning + pre-implementation audits documented in the WO
+- No release closeout without the staging audit documented

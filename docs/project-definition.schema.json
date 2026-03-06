@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibeos.dev/schemas/project-definition.schema.json",
+  "title": "VibeOS-2 Project Definition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "idea",
+    "users",
+    "scope",
+    "constraints",
+    "technical_recommendation",
+    "governance_profile"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "slug": {
+          "$ref": "#/$defs/evidenceString"
+        },
+        "repo_url": {
+          "$ref": "#/$defs/evidenceString"
+        }
+      }
+    },
+    "idea": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "summary",
+        "product_type"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/evidenceString"
+        },
+        "summary": {
+          "$ref": "#/$defs/evidenceString"
+        },
+        "problem_statement": {
+          "$ref": "#/$defs/evidenceString"
+        },
+        "product_type": {
+          "$ref": "#/$defs/evidenceEnum"
+        }
+      }
+    },
+    "users": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary_persona",
+        "secondary_personas"
+      ],
+      "properties": {
+        "primary_persona": {
+          "$ref": "#/$defs/evidenceString"
+        },
+        "secondary_personas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceString"
+          }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "core_workflows",
+        "v1_features",
+        "non_goals"
+      ],
+      "properties": {
+        "core_workflows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceString"
+          }
+        },
+        "v1_features": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceString"
+          }
+        },
+        "non_goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceString"
+          }
+        },
+        "success_metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceString"
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "platforms",
+        "integrations",
+        "sensitive_data",
+        "compliance_targets"
+      ],
+      "properties": {
+        "platforms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceEnum"
+          }
+        },
+        "integrations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceString"
+          }
+        },
+        "sensitive_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceEnum"
+          }
+        },
+        "compliance_targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceEnum"
+          }
+        }
+      }
+    },
+    "technical_recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "language",
+        "framework",
+        "database",
+        "deployment_shape"
+      ],
+      "properties": {
+        "language": {
+          "$ref": "#/$defs/evidenceEnum"
+        },
+        "framework": {
+          "$ref": "#/$defs/evidenceString"
+        },
+        "database": {
+          "$ref": "#/$defs/evidenceString"
+        },
+        "deployment_shape": {
+          "$ref": "#/$defs/evidenceString"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceString"
+          }
+        }
+      }
+    },
+    "governance_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "team_size",
+        "risk_level"
+      ],
+      "properties": {
+        "team_size": {
+          "$ref": "#/$defs/evidenceEnum"
+        },
+        "risk_level": {
+          "$ref": "#/$defs/evidenceEnum"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "string",
+      "enum": [
+        "user-confirmed",
+        "inferred",
+        "scanned",
+        "default"
+      ]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "impact": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "evidenceBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "source",
+        "confidence",
+        "impact"
+      ],
+      "properties": {
+        "value": {},
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "impact": {
+          "$ref": "#/$defs/impact"
+        }
+      }
+    },
+    "evidenceString": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/evidenceBase"
+        },
+        {
+          "properties": {
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "evidenceEnum": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/evidenceBase"
+        },
+        {
+          "properties": {
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
