@@ -8,9 +8,12 @@ This phase exists for greenfield and vibe-coded projects where the user knows th
 
 When interacting with the user during discovery:
 
-- explain the purpose of each step in plain English
+- explain the purpose of each step in plain English before doing it
+- explain what just happened and why it matters after each step
+- explain every technical term in easy-to-understand language the first time it appears
 - translate technical suggestions into product or workflow outcomes
 - avoid asking the user to choose technologies before they understand the business difference
+- when choices exist: explain each option, state pros/cons, make a recommendation based on evidence, and explain your rationale
 - summarize what was learned after each meaningful discovery step
 
 ## INPUT

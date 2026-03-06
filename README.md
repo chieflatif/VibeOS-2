@@ -18,18 +18,18 @@ A downloadable framework that any AI agent (Claude Code, Cursor, Codex) can read
 ## 60-Second Demo
 
 ```bash
-# 1. Clone this repo
+# 1. Clone this repo (or open it in your agent)
 git clone https://github.com/chieflatif/VibeOS-2.git
 
-# 2. Open your project in Claude Code
-cd your-project/
+# 2. Open your project folder in Claude Code, Cursor, or Codex
+#    (Your project is the workspace — the agent works in-place.)
 
 # 3. Tell the agent what you want to build
-# "Use /path/to/VibeOS-2 to turn my idea into a PRD and governed build setup"
+#    "Use VibeOS-2 to turn my idea into a PRD and governed build setup"
 
 # 4. Agent drafts a product brief + PRD + technical starting point
 # 5. Answer only the high-impact follow-up questions
-# 6. Agent builds governance automatically
+# 6. Agent builds governance, runs validation, and reports — no scripts for you to run
 ```
 
 ## Built For Vibe Coders

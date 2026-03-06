@@ -10,11 +10,11 @@ Read `docs/USER-COMMUNICATION-CONTRACT.md` before interacting with the user.
 
 Apply these rules throughout every phase:
 
-1. Start with business meaning, then explain technical detail in plain English
-2. Explain technical terms briefly the first time they matter
-3. After every major step, explain what happened, why it matters, and what happens next
-4. Present choices in outcome language first, technology language second
-5. Keep the user updated while work is in progress; do not go silent and return only with terminal-style output
+1. **Explain in easy terms** — Every technical term gets a brief, plain-English explanation the first time it appears.
+2. **Before acting** — Tell the user what you're about to do and why it matters.
+3. **After acting** — Start with business meaning, then explain what happened, what changed, and why it matters.
+4. **Choices require reasoning** — When presenting options: explain each in outcome language first, state pros/cons, make a recommendation based on evidence, and explain your rationale.
+5. **Never go silent** — Keep the user updated while work is in progress; do not return only with terminal-style output.
 
 Required response pattern for major milestones:
 
@@ -29,6 +29,7 @@ If the user appears non-technical or asks broad product questions:
 - explain assumptions clearly
 - translate technical choices into product, speed, risk, and maintainability implications
 - never ask the user to choose between raw technologies without first explaining the business difference
+- always make a recommendation when choices exist, and explain why you recommend it
 
 ## FRAMEWORK VERSION
 
@@ -155,6 +156,66 @@ IF the product definition is still too vague → ask the user for one target use
 ### ON FAILURE
 IF target_project_dir does not exist → ask user for the correct path.
 IF scripts/ has fewer than 15 files → framework may be incomplete. Warn user.
+
+---
+
+## PHASE 1.5: ENVIRONMENT DISCOVERY
+
+### PURPOSE
+
+Discover what tools, hosting, and Git access the agent has in the target project. Use this to tailor setup, avoid asking the user to run commands, and offer guided configuration when something is missing.
+
+### INPUT
+- target_project_dir from Phase 1
+
+### ACTION
+
+1. Run:
+   ```bash
+   bash {framework_dir}/helpers/verify-environment.sh {target_project_dir}
+   ```
+2. Parse the JSON output. You now have:
+   - `git.is_repo`, `git.remote_url`, `git.remote_host` (github | gitlab | other | none)
+   - `github_cli` (authenticated | not_authenticated | not_installed)
+   - `hosting_detected` (array: railway, vercel, supabase, aws, gcp, docker, or empty)
+   - `tools_available` (array: npm, node, python3, docker, gh, railway, vercel, supabase, etc.)
+
+3. Present a brief, business-first summary to the user:
+   - "I checked your environment. Here's what I found:"
+   - Tools: list what's available in plain English
+   - Git/GitHub: "Your project is linked to GitHub" OR "No remote yet" OR "GitHub CLI is installed but not signed in"
+   - Hosting: "I detected Railway/Vercel/Supabase config" OR "No hosting configured yet"
+
+4. IF tools, Git, or hosting are configured:
+   - Ask: "Which of these do you want to use for this project?" (only where there are options)
+5. IF something is missing and matters for the project:
+   - Offer to walk through setup: "I can guide you through getting GitHub connected" / "I can help you add Railway/Vercel credentials to your infrastructure manifest when you're ready"
+
+6. Do NOT tell the user to run scripts. You run them. Do NOT tell the user to "open this project in X" — the project is already the current workspace.
+
+### STORE
+```json
+{
+  "env_discovery": {
+    "git_repo": true,
+    "git_host": "github",
+    "github_cli": "authenticated",
+    "hosting_detected": ["railway"],
+    "tools_available": ["npm", "node", "gh"]
+  },
+  "user_confirmed_hosting": "railway",
+  "user_confirmed_ci": "github-actions"
+}
+```
+
+### VERIFY
+- [ ] Environment discovery ran successfully
+- [ ] User received a plain-English summary
+- [ ] Missing or optional config was addressed (either confirmed for later or walked through)
+
+### NO-CODE RULE
+
+The agent performs all script execution and environment checks. Never instruct the user to "run" a script. Say instead: "I'll run that now and report back" — then run it and report the result.
 
 ---
 
@@ -868,56 +929,45 @@ grep -rn '<!-- REQUIRED -->\|<!-- ADAPT' {target_project_dir}/ --include='*.md' 
 ```
 
 #### 7C: Generate Setup Summary
+
+**CRITICAL: The project is already in this workspace.** Do not tell the user to "open" the project in Claude Code, Cursor, or any other tool. They are already here.
+
+**CRITICAL: You run all validation scripts.** Never instruct the user to "run" a command. You run `gate-runner.sh pre_commit` as part of 7A — report the result in the summary, not as a user task.
+
 Print to user:
 
 ```
 === VibeOS-2 Setup Complete ===
 
-Project: {project.name}
-Framework Version: {VIBEOS_VERSION}
+What we just built: A complete product definition and enterprise governance foundation for {project.name}, ready for development to start.
 
-Files Created:
-  Scripts: {count} gate scripts in scripts/
-  Agent Config: {agent_config_path}
-  Rules: {count} rule files
-  Hooks: {count} hook scripts
-  Product Docs: {count} discovery artifacts
-  Governance Docs: {count} documents
-  Skills: {count} skill definitions
+Your project is ready. Governance is active in this workspace — hooks, rules, and gates are wired and will fire automatically.
 
-Gate Phases Active: {selected_phases}
+Environment check: I ran the pre-commit validation as part of setup. Result: {PASS | BASELINE with N known issues | see details below}. No action needed from you.
 
-Quality Gates:
-  Pre-commit: {list with tier}
-  WO-exit: {list with tier}
-  Full-audit: {list with tier}
-  Post-deploy: {list with tier}
+What's in {target_project_dir}:
+  Product Documents: {count} files in docs/product/
+  Gate Scripts: {count} in scripts/
+  Active Gate Phases: {selected_phases}
+  Compliance: {compliance_targets}
+  Hooks: {count} — fire automatically
+  Governance: CLAUDE.md (or .cursorrules / AGENTS.md), {count} rule files, {count} skills
 
 Known Baselines: {count} (pre-existing violations documented)
-  {list each baseline: gate name, failure count, reason}
+  {brief list or "None"}
 
-Compliance Coverage:
-  SOC 2: {covered/not targeted}
-  GDPR: {covered/not targeted}
-  OWASP: {covered/not targeted}
-
-Next Steps:
-  1. Run: bash scripts/gate-runner.sh pre_commit --continue-on-failure
-  2. Review docs/product/PRD.md and docs/TECHNICAL-SPEC.md with the user
-  3. Review docs/planning/WO-AUDIT-FRAMEWORK.md before planning the first Work Order
-  4. Create your first Work Order in docs/planning/WO-INDEX.md
-  5. Read CLAUDE.md (or .cursorrules / AGENTS.md) for governance rules
-  6. Fill in docs/INFRASTRUCTURE-MANIFEST.md with your infrastructure details
-
-To update VibeOS-2 later:
-  Re-run this bootstrap — it will preserve your config and update scripts.
+What you might do next (your choice):
+  • Add API keys and hosting details to docs/INFRASTRUCTURE-MANIFEST.md when you're ready
+  • Create your first Work Order — type /wo-research with a title and the agent will walk you through the full cycle
+  • Review docs/product/PRD.md and docs/TECHNICAL-SPEC.md to confirm the plan
+  • I can run a full audit or create the first WO for you — just ask
 ```
 
 The setup summary must follow the communication contract:
 
 - business-level summary first
 - technical explanation second
-- next steps with reasoning last
+- next steps as choices or agent-offered actions — never as "run this command"
 
 #### 7D: Commit (if user approves)
 ```

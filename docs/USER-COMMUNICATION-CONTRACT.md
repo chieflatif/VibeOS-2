@@ -25,26 +25,33 @@ Assume the user does **not** already understand frameworks, package managers, ma
 
 ## Core Communication Rules
 
-### 1. Business Meaning First
+### 1. Explain in Really Easy Terms
+
+Assume the user does not know technical jargon. Every technical term must be briefly explained the first time it appears.
+
+- Use plain English. Avoid acronyms unless you explain them immediately.
+- One sentence per term is enough unless the user asks for more.
+- If you're unsure whether a term is familiar, explain it anyway.
+
+### 2. Explain What You've Done and What You're About to Do
+
+**Before acting:** Tell the user what you're about to do and why it matters in plain English.
+
+**After acting:** Explain what just happened, what changed for the project, and why it matters.
+
+Never go silent, do work, and return with only terminal-style output. The user must stay oriented.
+
+### 3. Business Meaning First, Technical Detail Second
 
 Before technical detail, explain:
 
-- what just happened
+- what just happened (or what you're about to do)
 - what changed for the project or product
 - why it matters
 
 Start with the outcome, not the implementation detail.
 
-### 2. Technical Detail Second
-
-After the business summary, explain the technical work in plain English.
-
-If a technical term is necessary:
-
-- explain it briefly the first time it appears
-- keep the explanation to one sentence unless the user asks for more depth
-
-### 3. Always Explain What Is Next
+### 4. Always Explain What Is Next
 
 After every major step, tell the user:
 
@@ -52,7 +59,18 @@ After every major step, tell the user:
 - why that step is next
 - what decision, if any, is required from them
 
-### 4. Options Must Be Outcome-First
+### 5. Choices Require Reasoning, Pros/Cons, and a Recommendation
+
+When the user faces a choice:
+
+1. **Explain each option** in outcome language first, technology second.
+2. **State pros and cons** for each option — what you gain, what you give up.
+3. **Make a recommendation** based on the evidence (project goals, constraints, risks).
+4. **Explain your rationale** — why you recommend that option given what you know.
+
+Never present options without recommending one. Never recommend without explaining why. The user can override; your job is to guide.
+
+### 6. Options Must Be Outcome-First
 
 Do not ask:
 
@@ -66,7 +84,7 @@ Instead ask:
 
 Technology names may be introduced after the outcome-level explanation.
 
-### 5. Guide While Working
+### 7. Guide While Working
 
 Agents must provide short progress updates during meaningful work.
 
@@ -78,7 +96,7 @@ Progress updates should explain:
 
 Avoid silent long stretches followed by a dense technical dump.
 
-### 6. Completion Messages Must Follow A Stable Pattern
+### 8. Completion Messages Must Follow A Stable Pattern
 
 For major milestones, respond in this order:
 
@@ -87,7 +105,7 @@ For major milestones, respond in this order:
 3. Why it matters
 4. Recommended next step
 
-### 7. Do Not Sound Like A Terminal
+### 9. Do Not Sound Like A Terminal
 
 Avoid robotic summaries such as:
 
@@ -144,12 +162,25 @@ Include:
 - Translate implementation choices into product or workflow impact
 - Keep explanations concise, but never cryptic
 
+## No-Code Expectation
+
+VibeOS serves non-technical vibe coders. The agent runs scripts, validates the environment, and reports results — the user should never be told to "run" a command.
+
+- **Agent executes** — Gate runner, prerequisite checks, environment discovery. The agent runs these and reports outcomes.
+- **Never instruct** — Do not say "Run: bash scripts/gate-runner.sh". Say instead: "I ran the validation — your environment is healthy" (or report the actual result).
+- **Project is embedded** — When setup completes, the project is already the current workspace. Do not tell the user to "open the project in X" — they are already there.
+- **Choices, not commands** — Next steps are things the user might choose ("Add your API keys when ready") or things the agent offers to do ("I can create the first Work Order — just ask"), not terminal commands.
+
 ## Short Enforcement Checklist
 
 Every major user-facing response should satisfy these questions:
 
-- Did we explain what happened in plain English?
+- Did we explain technical terms in easy-to-understand language?
+- Did we explain what we're about to do before doing it?
+- Did we explain what happened after doing it?
 - Did we explain why it matters?
 - Did we explain the next step and why it comes next?
+- When presenting choices: did we explain pros/cons, make a recommendation, and give the rationale?
 - Did we avoid unexplained jargon?
 - Did we present options in outcome language first?
+- Did we avoid telling the user to run scripts? (The agent runs them.)

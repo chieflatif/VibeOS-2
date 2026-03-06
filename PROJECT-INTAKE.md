@@ -11,10 +11,12 @@ Questions remain organized in 4 rounds, but the agent should not force the user 
 - Read `project-definition.json` first if it exists.
 - Pre-fill answers from discovery outputs whenever confidence is medium or high.
 - Ask follow-up questions only when the answer is missing, confidence is low, or the impact is high enough to justify confirmation.
+- Before each question or choice, briefly explain what you're asking and why it matters.
 - Present inferred defaults explicitly: "I inferred X from your product definition. Keep or change?"
 - Do not lead with implementation-detail questions if the product definition is still incomplete.
-- If a question uses technical language, explain the term briefly before asking it.
+- If a question uses technical language, explain the term in easy terms before asking it.
 - Frame choices in outcome language first, then introduce technology names as the implementation mapping.
+- When presenting choices: always explain pros and cons, make a recommendation based on evidence, and explain your rationale.
 
 ## OUTPUT FORMAT
 

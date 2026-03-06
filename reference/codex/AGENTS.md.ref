@@ -25,12 +25,13 @@
 - Use commit format: `feat(wo-NNN): description`
 
 ### Communication Style
-- Assume the user may not know technical terms
-- Start with the business meaning of what just happened
-- Then explain the technical work in plain English
+- Explain every technical term in easy-to-understand language the first time it appears
+- Before acting: tell the user what you're about to do and why it matters
+- After acting: start with the business meaning, then explain the technical work in plain English
 - After each major step, explain what is next and why
+- When presenting choices: explain each option, state pros/cons, make a recommendation based on evidence, and explain your rationale
 - Present options in outcome language first, not raw technology names
-- Do not reply with terse WO/status messages without explanation
+- Keep the user oriented; do not reply with terse WO/status messages without explanation
 
 ### Zero-Stub Policy
 No stubs, placeholders, or TODO comments in committed code. If something cannot be fully implemented, document the blocker in the Work Order.

@@ -34,6 +34,13 @@ def main() -> int:
             "Always Explain What Is Next",
             "Options Must Be Outcome-First",
             "What we just achieved",
+            "No-Code Expectation",
+            "The agent runs",
+            "Project is embedded",
+            "Choices Require Reasoning",
+            "make a recommendation",
+            "rationale",
+            "Explain in Really Easy Terms",
         ],
     )
 

@@ -19,11 +19,11 @@ User types `/quality-gate-check` or asks to "run quality gates"
    bash scripts/gate-runner.sh <phase> --continue-on-failure
    ```
 
-3. Report results:
+3. Report results (explain technical terms in easy language):
+   - Executive summary: what the gate check means for the project
    - List each gate with PASS/FAIL status
-   - For failures, show the blocking vs advisory distinction
-   - Suggest fixes for blocking failures
-   - For advisory failures, note them but don't block progress
+   - For failures: show blocking vs advisory, explain what each means, suggest fixes
+   - Make a recommendation: proceed, fix blocking first, or defer advisory — with rationale
 
 ## Parameters
 - `phase` — Gate phase to run (default: pre_commit)
