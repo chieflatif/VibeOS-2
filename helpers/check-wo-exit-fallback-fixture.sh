@@ -52,7 +52,8 @@ cat > "$TMP_DIR/quality-gate-manifest.json" <<'EOF'
           "script": "scripts/validate-work-order.sh",
           "tier": 1,
           "env": {
-            "WO_DIR": "docs/planning"
+            "WO_DIR": "docs/planning",
+            "WO_NUMBER": "$WO_NUMBER"
           }
         }
       ]
@@ -93,8 +94,8 @@ if ! printf '%s\n' "$output" | grep -q "\[no-secrets\]"; then
   exit 1
 fi
 
-if ! printf '%s\n' "$output" | grep -q "\[work-order-validation\]"; then
-  echo "[check-wo-exit-fallback-fixture] FAIL: runner did not include governance fallback gates" >&2
+if ! printf '%s\n' "$output" | grep -Eq "\[work-order-validation\].* PASS "; then
+  echo "[check-wo-exit-fallback-fixture] FAIL: governance fallback WO gate did not pass" >&2
   exit 1
 fi
 

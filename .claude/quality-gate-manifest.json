@@ -44,7 +44,10 @@
           "name": "work-order-validation",
           "script": "scripts/validate-work-order.sh",
           "tier": 1,
-          "env": { "WO_DIR": "docs/planning" }
+          "env": {
+            "WO_DIR": "docs/planning",
+            "WO_NUMBER": "$WO_NUMBER"
+          }
         }
       ]
     },

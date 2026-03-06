@@ -38,7 +38,8 @@ cat > "$TMP_DIR/quality-gate-manifest.json" <<'EOF'
           "script": "scripts/validate-work-order.sh",
           "tier": 1,
           "env": {
-            "WO_DIR": "docs/planning"
+            "WO_DIR": "docs/planning",
+            "WO_NUMBER": "$WO_NUMBER"
           }
         }
       ]
@@ -75,8 +76,8 @@ if ! printf '%s\n' "$output" | grep -q "Manifest: $TMP_DIR/quality-gate-manifest
   exit 1
 fi
 
-if ! printf '%s\n' "$output" | grep -q "work-order-validation"; then
-  echo "[check-root-manifest-fixture] FAIL: runner did not execute WO gate" >&2
+if ! printf '%s\n' "$output" | grep -Eq "\[work-order-validation\].* PASS "; then
+  echo "[check-root-manifest-fixture] FAIL: WO gate did not pass under root manifest" >&2
   exit 1
 fi
 
