@@ -48,8 +48,8 @@ Total always-on: 13 gates
 ```
 IF database IN [postgresql, mysql, sqlite]:
   ENABLE: validate-tenant-isolation.sh
-    tier = IF compliance includes "GDPR" THEN 1 ELSE 2
-    blocking = IF compliance includes "GDPR" THEN true ELSE false
+    tier = IF compliance includes "gdpr" THEN 1 ELSE 2
+    blocking = IF compliance includes "gdpr" THEN true ELSE false
 
 IF database == "none" OR database == "redis-only" OR database == "mongodb":
   SKIP: validate-tenant-isolation.sh
@@ -57,18 +57,18 @@ IF database == "none" OR database == "redis-only" OR database == "mongodb":
 
 ### Compliance Gates
 ```
-IF compliance includes "SOC 2":
+IF compliance includes "soc2":
   ENABLE:
     validate-evidence-bundle.sh      tier=1  blocking=true
     validate-audit-completeness.sh   tier=1  blocking=true
     validate-pii-handling.sh         tier=2  blocking=false
 
-IF compliance includes "GDPR":
+IF compliance includes "gdpr":
   ENABLE:
     validate-pii-handling.sh         tier=1  blocking=true   (upgrade tier if already enabled)
     validate-tenant-isolation.sh     tier=1  blocking=true   (upgrade tier if already enabled)
 
-IF compliance includes "OWASP":
+IF compliance includes "owasp":
   ENABLE:
     validate-owasp-alignment.sh      tier=1  blocking=true
   MODIFY:

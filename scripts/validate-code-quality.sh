@@ -158,7 +158,7 @@ elif [[ "$LANGUAGE" == "typescript" || "$LANGUAGE" == "javascript" ]]; then
     current_section="TYPE_CHECK"
     echo "=== TypeScript Type Check ==="
     if command -v npx >/dev/null 2>&1 && [[ -f "$repo_root/tsconfig.json" ]]; then
-      run_cmd npx tsc --noEmit 2>&1 || true
+      run_cmd npx tsc --noEmit 2>&1
     else
       echo "[$GATE_NAME] WARN: TypeScript compiler not available. Skipping type check."
     fi
@@ -172,9 +172,9 @@ elif [[ "$LANGUAGE" == "typescript" || "$LANGUAGE" == "javascript" ]]; then
     run_cmd $LINTER
   elif command -v npx >/dev/null 2>&1; then
     if [[ -f "$repo_root/.eslintrc.js" ]] || [[ -f "$repo_root/.eslintrc.json" ]] || [[ -f "$repo_root/.eslintrc.yml" ]] || [[ -f "$repo_root/eslint.config.js" ]] || [[ -f "$repo_root/eslint.config.mjs" ]]; then
-      run_cmd npx eslint "$source_path" 2>&1 || true
+      run_cmd npx eslint "$source_path" 2>&1
     elif [[ -f "$repo_root/biome.json" ]] || [[ -f "$repo_root/biome.jsonc" ]]; then
-      run_cmd npx biome check "$source_path" 2>&1 || true
+      run_cmd npx biome check "$source_path" 2>&1
     else
       echo "[$GATE_NAME] WARN: No JS/TS linter config found. Skipping lint."
       echo "Configure eslint or biome for lint checks."
@@ -204,7 +204,7 @@ elif [[ "$LANGUAGE" == "go" ]]; then
   if command -v golangci-lint >/dev/null 2>&1; then
     echo ""
     echo "=== golangci-lint ==="
-    run_cmd golangci-lint run 2>&1 || true
+    run_cmd golangci-lint run 2>&1
   fi
 
 # ============================================================================
@@ -224,7 +224,7 @@ elif [[ "$LANGUAGE" == "rust" ]]; then
   echo ""
   echo "=== Clippy Lint ==="
   if cargo clippy --version >/dev/null 2>&1; then
-    run_cmd cargo clippy -- -D warnings 2>&1 || true
+    run_cmd cargo clippy -- -D warnings 2>&1
   else
     echo "[$GATE_NAME] WARN: clippy not installed. Skipping lint."
   fi

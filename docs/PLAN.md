@@ -2,6 +2,7 @@
 
 > **INTERNAL BUILD DOCUMENT** — This file tracks implementation progress and source mappings.
 > It is NOT part of the distributable framework. Add to .gitignore before release.
+> Historical note: this document captures the build plan and source mapping history. For the current runtime contract, use `docs/CANONICAL-CONTRACT.md` and `docs/MIGRATION.md`.
 
 ## Context
 
@@ -178,7 +179,7 @@ enterprise-dev-framework/
 │
 └── helpers/                        ← Mechanical utilities the agent calls
     ├── render-template.sh          ← jq for JSON, sed for markdown
-    ├── verify-prerequisites.sh     ← Checks bash 4+, python 3.7+, git, jq
+    ├── verify-prerequisites.sh     ← Checks bash 3.2+, python 3.7+, git, jq
     └── verify-setup.sh             ← Post-setup validation (all gates run, no crashes)
 ```
 
@@ -198,9 +199,9 @@ The core innovation. This is what the agent reads first. Written in agent-execut
 - INPUT: PROJECT-INTAKE.md questionnaire
 - ACTION: Ask user 18 questions across 4 rounds:
   - Round 1 (Identity): project name, slug, description, repo URL
-  - Round 2 (Stack): language, framework, source dirs, test dir, package manager, database, cloud provider
-  - Round 3 (Governance): team size, compliance targets (SOC 2/GDPR/OWASP/none), WO dir, frozen files, production URLs
-  - Round 4 (Agent): preferred agent, multi-agent team?, CI/CD platform, MCP servers
+  - Round 2 (Stack): language, framework, source dirs, test dir, package manager, database
+  - Round 3 (Governance): team size, compliance targets (`soc2`/`gdpr`/`owasp`/`none`), WO dir, frozen files, production URLs
+  - Round 4 (Agent): cloud provider, CI/CD platform, MCP servers
 - STORE: Project config (structured JSON)
 - VERIFY: All required fields populated, source dirs exist
 
@@ -210,7 +211,7 @@ The core innovation. This is what the agent reads first. Written in agent-execut
 - DECISIONS:
   - Gates: All 20 always available. Pre-commit (4) always on. WO-exit gates selected by stack. Full-audit gates selected by compliance targets.
   - Phases: Solo dev → 4 phases (pre_commit, wo_exit, full_audit, session_start). Team → 7 phases (add wo_entry, component exits, session_end). Enterprise → 10 phases (add post_deploy, wo_exit_governance).
-  - Hooks: Claude Code → all 8. Cursor → secrets-scan + frozen-files (via .cursorrules). Codex → none (no hook support).
+  - Hooks: Claude Code → current hook contract via stdin JSON (`PreToolUse`, `PostToolUseFailure`, `UserPromptSubmit`, `SessionStart`, `SubagentStop`). Cursor/Codex → no runtime hooks, governance embedded in `.cursorrules` / `AGENTS.md`.
   - Architecture rules: FastAPI → API purity + router isolation. Django → app isolation + ORM enforcement. Express → middleware isolation + async patterns.
 - STORE: Selected configuration
 - VERIFY: Print summary, get user confirmation before proceeding
@@ -218,10 +219,10 @@ The core innovation. This is what the agent reads first. Written in agent-execut
 **Phase 4: Mechanical Setup**
 - INPUT: Selected configuration
 - ACTION:
-  1. Run `helpers/verify-prerequisites.sh` — check bash 4+, python 3.7+, git, jq
+  1. Run `helpers/verify-prerequisites.sh` — check bash 3.2+, python 3.7+, git, jq
   2. Create directory structure: `scripts/`, `docs/planning/`, `.claude/` (or equivalent)
   3. Copy selected gate scripts to project's `scripts/`
-  4. Generate quality-gate-manifest.json from selected phases + gates + tiers
+  4. Generate the quality gate manifest from selected phases + gates + tiers
   5. Generate architecture-rules.json from framework-specific rules
   6. Set up pre-commit hooks (`.pre-commit-config.yaml`)
 - STORE: Paths of all created files
@@ -289,11 +290,11 @@ Located in `decision-engine/`. Each file is a decision tree the agent follows.
 
 ### gate-selection.md
 ```
-IF compliance includes "SOC 2":
+IF compliance includes "soc2":
   ENABLE: validate-evidence-bundle, validate-audit-completeness, validate-pii-handling
-IF compliance includes "OWASP":
+IF compliance includes "owasp":
   ENABLE: validate-owasp-alignment, validate-security-patterns (strict mode)
-IF compliance includes "GDPR":
+IF compliance includes "gdpr":
   ENABLE: validate-pii-handling (strict mode), validate-tenant-isolation
 IF database == "postgresql" OR database == "mysql":
   ENABLE: validate-tenant-isolation
@@ -317,15 +318,16 @@ IF team_size == "enterprise" (5+):
 ### hook-selection.md
 ```
 IF agent == "claude-code":
-  ALWAYS: secrets-scan, frozen-files, session-start, session-resume, capture-failure
+  ALWAYS: secrets-scan, session-start, capture-failure
+  IF has_frozen_files: frozen-files
   IF has_production_urls: staging-target
   IF has_subagents: validate-audit-result
   IF compliance != "none": governance-guard
 IF agent == "cursor":
-  EMBED in .cursorrules: secrets-scan patterns, frozen-file warnings
+  EMBED in .cursorrules: governance rules, manifest location, secrets/frozen-file warnings
   NO hooks (Cursor doesn't support hook scripts)
 IF agent == "codex":
-  EMBED in AGENTS.md: governance rules as text instructions
+  EMBED in AGENTS.md: governance rules, manifest location, and quality-gate commands
   NO hooks (Codex doesn't support hook scripts)
 ```
 
@@ -446,7 +448,7 @@ All scripts are parameterized via environment variables. The agent sets these in
 - Write Claude references: CLAUDE.md.ref + 8 rule files (governance-cascade, evidence-first, no-stubs, architecture, mandatory-audit, security, wo-protocol, version-validation)
 - Write Cursor reference: cursorrules.ref
 - Write Codex reference: AGENTS.md.ref
-- Write governance references: WO-INDEX.md.ref, WO-TEMPLATE.md.ref, ADR-TEMPLATE.md.ref, DESIGN-DOC-TEMPLATE.md.ref, ARCHITECTURE.md.ref, INFRASTRUCTURE-MANIFEST.md.ref
+- Write governance references: WO-INDEX.md.ref, WO-TEMPLATE.md.ref, ADR-TEMPLATE.md.ref, DESIGN-DOC-TEMPLATE.md.ref, ARCHITECTURE.md.ref, INFRASTRUCTURE-MANIFEST.md.ref (including cloud provider, MCP, and data privacy sections)
 - Write skill references: quality-gate-check.md.ref, wo-complete.md.ref, post-phase-audit.md.ref, wo-research.md.ref
 - Write shared references: pre-commit-config.yaml.ref
 
@@ -497,7 +499,7 @@ All scripts are parameterized via environment variables. The agent sets these in
 | `~/.claude/CORE-PRINCIPLES.md` | `docs/CORE-PRINCIPLES.md` | Clean, generalize, add sections |
 | `CLAUDE.md` | `reference/claude/CLAUDE.md.ref` | Annotate with ADAPT/REQUIRED markers |
 | `.claude/rules/always/*.md` | `reference/claude/rules/*.md.ref` | Annotate |
-| `.claude/quality-gate-manifest.json` | `reference/manifests/quality-gate-manifest.json.ref` | Expand + annotate |
+| `.claude/quality-gate-manifest.json` and `quality-gate-manifest.json` | `reference/manifests/quality-gate-manifest.json.ref` | Expand + annotate, with runner auto-discovery |
 
 ### From SalesSidekick (adapt + annotate)
 | Source | Target | Action |

@@ -13,7 +13,7 @@ Map compliance targets to specific gates, tiers, evidence requirements, and docu
 
 ### When Selected
 ```
-IF compliance includes "SOC 2":
+IF compliance includes "soc2":
 ```
 
 ### Gates
@@ -70,7 +70,7 @@ GENERATE:
 
 ### When Selected
 ```
-IF compliance includes "GDPR":
+IF compliance includes "gdpr":
 ```
 
 ### Gates
@@ -130,7 +130,7 @@ GENERATE:
 
 ### When Selected
 ```
-IF compliance includes "OWASP":
+IF compliance includes "owasp":
 ```
 
 ### Gates
@@ -244,7 +244,7 @@ NOTE in setup summary:
 When multiple standards are selected, rules COMBINE (union, not override):
 
 ```
-IF compliance includes ["SOC 2", "GDPR"]:
+IF compliance includes ["soc2", "gdpr"]:
   validate-pii-handling.sh → tier 1 (highest of both)
   validate-evidence-bundle.sh → tier 1 (SOC 2)
   validate-tenant-isolation.sh → tier 1 (GDPR)
@@ -252,13 +252,13 @@ IF compliance includes ["SOC 2", "GDPR"]:
   PII_PATTERNS: GDPR strict mode patterns
   Evidence bundles: SOC 2 format
 
-IF compliance includes ["SOC 2", "OWASP"]:
+IF compliance includes ["soc2", "owasp"]:
   validate-security-patterns.sh → tier 1, STRICT_MODE=true (OWASP)
   validate-owasp-alignment.sh → tier 1 (OWASP)
   validate-evidence-bundle.sh → tier 1 (SOC 2)
   Evidence bundles must include security scan results
 
-IF compliance includes ["SOC 2", "GDPR", "OWASP"]:
+IF compliance includes ["soc2", "gdpr", "owasp"]:
   ALL compliance gates → tier 1
   ALL strict modes → enabled
   FULL evidence requirements

@@ -12,7 +12,7 @@
 # Options:
 #   --continue-on-failure   Don't stop on first blocking gate failure
 #   --json                  Output results as JSON
-#   --manifest PATH         Custom manifest path (default: .claude/quality-gate-manifest.json)
+#   --manifest PATH         Custom manifest path (default: auto-discover .claude/ then project root)
 #   --wo NUMBER             Work order number (substitutes $WO_NUMBER in gate env)
 #   --evidence-dir PATH     Evidence directory (substitutes $EVIDENCE_DIR in gate env)
 #   --timeout SECONDS       Per-gate timeout (default: 120)
@@ -75,7 +75,14 @@ die()  { err "$*"; exit 2; }
 # ─── Defaults ────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
-MANIFEST_PATH="${MANIFEST_PATH:-$PROJECT_ROOT/.claude/quality-gate-manifest.json}"
+DEFAULT_CLAUDE_MANIFEST="$PROJECT_ROOT/.claude/quality-gate-manifest.json"
+DEFAULT_ROOT_MANIFEST="$PROJECT_ROOT/quality-gate-manifest.json"
+if [[ -n "${MANIFEST_PATH:-}" ]]; then
+  MANIFEST_EXPLICIT=true
+else
+  MANIFEST_PATH=""
+  MANIFEST_EXPLICIT=false
+fi
 GATE_TIMEOUT="${GATE_TIMEOUT:-120}"
 WO_NUMBER="${WO_NUMBER:-}"
 EVIDENCE_DIR="${EVIDENCE_DIR:-}"
@@ -93,7 +100,7 @@ while [[ $# -gt 0 ]]; do
     -h|--help) usage; exit 0 ;;
     --continue-on-failure) CONTINUE_ON_FAILURE=true; shift ;;
     --json) JSON_OUTPUT=true; shift ;;
-    --manifest) MANIFEST_PATH="$2"; shift 2 ;;
+    --manifest) MANIFEST_PATH="$2"; MANIFEST_EXPLICIT=true; shift 2 ;;
     --wo) WO_NUMBER="$2"; shift 2 ;;
     --evidence-dir) EVIDENCE_DIR="$2"; shift 2 ;;
     --timeout) GATE_TIMEOUT="$2"; shift 2 ;;
@@ -115,9 +122,26 @@ if [[ -z "$PHASE" ]]; then
   die "Phase argument required"
 fi
 
+resolve_manifest_path() {
+  if [[ "$MANIFEST_EXPLICIT" == "true" ]]; then
+    printf '%s' "$MANIFEST_PATH"
+    return 0
+  fi
+
+  if [[ -f "$DEFAULT_CLAUDE_MANIFEST" ]]; then
+    printf '%s' "$DEFAULT_CLAUDE_MANIFEST"
+  elif [[ -f "$DEFAULT_ROOT_MANIFEST" ]]; then
+    printf '%s' "$DEFAULT_ROOT_MANIFEST"
+  else
+    printf '%s' "$DEFAULT_CLAUDE_MANIFEST"
+  fi
+}
+
+MANIFEST_PATH="$(resolve_manifest_path)"
+
 # ─── Validate Manifest ──────────────────────────────────────────
 if [[ ! -f "$MANIFEST_PATH" ]]; then
-  die "Manifest not found: $MANIFEST_PATH"
+  die "Manifest not found: $MANIFEST_PATH (looked for .claude/quality-gate-manifest.json then quality-gate-manifest.json)"
 fi
 
 if ! command -v jq >/dev/null 2>&1; then
@@ -188,11 +212,6 @@ with open(manifest_path) as f:
 
 phases = manifest.get("phases", {})
 
-if target_phase not in phases:
-    print(f"ERROR:Phase '{target_phase}' not found in manifest", file=sys.stderr)
-    print(f"ERROR:Available phases: {', '.join(sorted(phases.keys()))}", file=sys.stderr)
-    sys.exit(1)
-
 def resolve_phase(phase_name, visited=None):
     """Resolve a phase's gates, including inherited gates from 'includes'."""
     if visited is None:
@@ -215,7 +234,30 @@ def resolve_phase(phase_name, visited=None):
 
     return gates
 
-raw_gates = resolve_phase(target_phase)
+if target_phase in phases:
+    raw_gates = resolve_phase(target_phase)
+elif target_phase == "wo_exit":
+    fallback_phases = [
+        name for name in (
+            "wo_exit_backend",
+            "wo_exit_frontend",
+            "wo_exit_crosscutting",
+            "wo_exit_governance",
+        )
+        if name in phases
+    ]
+    if not fallback_phases:
+        print(f"ERROR:Phase '{target_phase}' not found in manifest", file=sys.stderr)
+        print(f"ERROR:Available phases: {', '.join(sorted(phases.keys()))}", file=sys.stderr)
+        sys.exit(1)
+
+    raw_gates = []
+    for phase_name in fallback_phases:
+        raw_gates.extend(resolve_phase(phase_name))
+else:
+    print(f"ERROR:Phase '{target_phase}' not found in manifest", file=sys.stderr)
+    print(f"ERROR:Available phases: {', '.join(sorted(phases.keys()))}", file=sys.stderr)
+    sys.exit(1)
 
 # Deduplicate by script path, keeping the LAST occurrence (most specific config wins)
 seen = {}
@@ -388,7 +430,11 @@ for k, v in env.items():
   fi
 
   if [[ $exit_code -eq 0 ]]; then
-    echo "PASS|$gate_name|$exit_code|$duration"
+    if printf '%s\n' "$output" | grep -q 'SKIP:'; then
+      echo "SKIP|$gate_name|$exit_code|$duration|$output"
+    else
+      echo "PASS|$gate_name|$exit_code|$duration"
+    fi
   else
     echo "FAIL|$gate_name|$exit_code|$duration|$output"
   fi
@@ -516,10 +562,11 @@ while IFS= read -r gate_line; do
       ;;
 
     FAIL)
+      gate_exit_code=$(echo "$result" | cut -d'|' -f3)
       gate_output=$(echo "$result" | cut -d'|' -f5-)
 
       # Check baseline
-      baseline_result=$(check_baseline "$gate_name" "1" "$gate_output")
+      baseline_result=$(check_baseline "$gate_name" "$gate_exit_code" "$gate_output")
       baseline_status=$(echo "$baseline_result" | cut -d'|' -f1)
 
       case "$baseline_status" in

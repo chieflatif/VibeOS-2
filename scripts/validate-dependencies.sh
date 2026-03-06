@@ -6,6 +6,7 @@
 #   bash scripts/validate-dependencies.sh
 #
 # Environment:
+#   PROJECT_ROOT  — target project root (default: script parent)
 #   LANGUAGE      — python|typescript|javascript|go|rust|java (default: auto-detect)
 #   PACKAGE_FILE  — path to package manifest (default: auto-detect)
 #
@@ -24,6 +25,7 @@ Usage:
   bash scripts/validate-dependencies.sh
 
 Environment:
+  PROJECT_ROOT  Target project root (default: script parent)
   LANGUAGE      python|typescript|javascript|go|rust|java (default: auto-detect)
   PACKAGE_FILE  Path to package manifest (default: auto-detect)
 
@@ -44,7 +46,7 @@ fi
 echo "[$GATE_NAME] Dependency Security Validation"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+repo_root="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
 # Auto-detect language
 detect_language() {
@@ -106,6 +108,11 @@ case "$LANGUAGE" in
         exit 1
       fi
     elif [[ -f "$repo_root/package-lock.json" ]] || [[ -f "$repo_root/package.json" ]]; then
+      if ! command -v npm >/dev/null 2>&1; then
+        echo "[$GATE_NAME] WARN: npm not installed. Install Node.js/npm to audit JS/TS dependencies"
+        echo "[$GATE_NAME] SKIP: Cannot audit JS/TS dependencies without npm"
+        exit 0
+      fi
       echo "=== npm audit ==="
       if (cd "$repo_root" && npm audit --audit-level=moderate) 2>&1; then
         echo "[$GATE_NAME] PASS: No known JS/TS vulnerabilities"

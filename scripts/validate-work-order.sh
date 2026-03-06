@@ -32,13 +32,14 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     exit 0
 fi
 
-# Graceful skip if no WO number provided
-if [[ $# -lt 1 || -z "${1:-}" || "${1:-}" == '$WO_NUMBER' ]]; then
+# Graceful skip if no WO number provided via arg or env
+WO_NUMBER_INPUT="${1:-${WO_NUMBER:-}}"
+if [[ -z "$WO_NUMBER_INPUT" || "$WO_NUMBER_INPUT" == '$WO_NUMBER' ]]; then
     echo "[$GATE_NAME] SKIP: No WO number provided — skipping WO validation"
     exit 0
 fi
 
-WO_NUMBER="$1"
+WO_NUMBER="$WO_NUMBER_INPUT"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 

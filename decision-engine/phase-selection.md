@@ -14,6 +14,8 @@ Determine which gate phases to enable based on team size and project complexity.
 ## PHASE DEFINITIONS
 
 ```
+
+`wo_exit` is the universal user-facing audit phase. Small and enterprise projects may also expose specialized `wo_exit_*` phases, but `gate-runner.sh wo_exit` must remain valid through an explicit phase or compatibility fallback.
 session_start     tier=0  "Run at session start — env checks, drift detection"
 wo_entry          tier=1  "Run before starting any WO — prerequisites check"
 pre_commit        tier=1  "Run before every commit — fast, blocking gates"
@@ -129,7 +131,7 @@ wo_exit_governance:
   - validate-work-order.sh (verify WO is complete)
   - validate-no-secrets.sh
   - detect-stubs-placeholders.py
-  - validate-evidence-bundle.sh (IF compliance includes SOC 2)
+  - validate-evidence-bundle.sh (IF compliance includes soc2)
   - validate-dependency-versions.sh
   - validate-dependencies.sh
 

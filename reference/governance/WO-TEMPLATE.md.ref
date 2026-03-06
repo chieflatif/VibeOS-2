@@ -49,6 +49,15 @@
 
 <!-- Links to test results, gate output, screenshots -->
 
+### Evidence Location
+
+<!-- OPTIONAL: For SOC 2 or evidence-first workflows -->
+`docs/evidence/WO-$PROJECT_SLUG-NNN/`
+
+## Audit Notes
+
+<!-- REQUIRED for compliance-heavy projects: summarize gate results, baselines, and exceptions -->
+
 ## Notes
 
 <!-- Additional context, decisions made during implementation -->

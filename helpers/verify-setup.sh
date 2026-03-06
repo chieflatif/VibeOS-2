@@ -106,14 +106,15 @@ for MANIFEST_PATH in "$TARGET_DIR/.claude/quality-gate-manifest.json" "$TARGET_D
                 fail "Manifest missing 'phases' section"
             fi
 
-            if jq -e '.tier_definitions' "$MANIFEST_PATH" >/dev/null 2>&1; then
-                pass "Manifest has tier definitions"
+            if jq -e '.tiers' "$MANIFEST_PATH" >/dev/null 2>&1; then
+                TIER_COUNT=$(jq '.tiers | keys | length' "$MANIFEST_PATH" 2>/dev/null || echo 0)
+                pass "Manifest has tier definitions ($TIER_COUNT tiers)"
             else
-                warn "Manifest missing 'tier_definitions' section"
+                warn "Manifest missing 'tiers' section"
             fi
 
             if jq -e '.known_baselines' "$MANIFEST_PATH" >/dev/null 2>&1; then
-                BASELINE_COUNT=$(jq '.known_baselines.entries | length' "$MANIFEST_PATH" 2>/dev/null || echo 0)
+                BASELINE_COUNT=$(jq '.known_baselines | length' "$MANIFEST_PATH" 2>/dev/null || echo 0)
                 pass "Manifest has known_baselines ($BASELINE_COUNT entries)"
             else
                 warn "Manifest missing 'known_baselines' section"

@@ -27,7 +27,9 @@ You don't have to adopt everything at once. Pick the tier that matches your curr
 **Additional setup:**
 1. Copy all gate scripts from `scripts/` to your project
 2. Copy `scripts/gate-runner.sh` (orchestrator)
-3. Create `.claude/quality-gate-manifest.json` (use reference as starting point)
+3. Create the manifest using the reference:
+   - Claude Code: `.claude/quality-gate-manifest.json`
+   - Cursor/Codex: `quality-gate-manifest.json`
 4. Create `scripts/architecture-rules.json` for your project
 
 **Additional gates:**

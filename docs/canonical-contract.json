@@ -1,0 +1,96 @@
+{
+  "version": "1.0.0",
+  "manifest": {
+    "claude": ".claude/quality-gate-manifest.json",
+    "non_claude": "quality-gate-manifest.json",
+    "runner_lookup_order": [
+      ".claude/quality-gate-manifest.json",
+      "quality-gate-manifest.json"
+    ]
+  },
+  "phases": {
+    "user_facing": [
+      "session_start",
+      "pre_commit",
+      "wo_exit",
+      "full_audit",
+      "post_deploy",
+      "session_end"
+    ],
+    "specialized_wo_exit": [
+      "wo_exit_backend",
+      "wo_exit_frontend",
+      "wo_exit_crosscutting",
+      "wo_exit_governance"
+    ],
+    "aliases": {
+      "wo_exit": {
+        "fallback_includes": [
+          "wo_exit_backend",
+          "wo_exit_frontend",
+          "wo_exit_crosscutting",
+          "wo_exit_governance"
+        ]
+      }
+    }
+  },
+  "hooks": {
+    "claude_events": [
+      "PreToolUse",
+      "PostToolUseFailure",
+      "UserPromptSubmit",
+      "SessionStart",
+      "SubagentStop"
+    ],
+    "io_contract": {
+      "input": "stdin_json",
+      "allow_exit_code": 0,
+      "block_exit_code": 2
+    }
+  },
+  "gate_contract": {
+    "pass": {
+      "exit_code": 0,
+      "marker": "PASS:"
+    },
+    "skip": {
+      "exit_code": 0,
+      "marker": "SKIP:"
+    },
+    "policy_failure": {
+      "exit_code": 1
+    },
+    "config_error": {
+      "exit_code": 2
+    }
+  },
+  "tiers": {
+    "source_of_truth": "tiers",
+    "per_gate_blocking_override": false
+  },
+  "compliance": {
+    "internal_names": [
+      "soc2",
+      "gdpr",
+      "owasp",
+      "none"
+    ],
+    "display_names": {
+      "soc2": "SOC 2",
+      "gdpr": "GDPR",
+      "owasp": "OWASP"
+    }
+  },
+  "dependency_intelligence_mvp": {
+    "supported_project_types": [
+      "javascript_application",
+      "typescript_application",
+      "python_application"
+    ],
+    "explicit_non_goals": [
+      "full_cross_ecosystem_compatibility_solver",
+      "deep_go_rust_java_support_in_initial_release",
+      "automatic_upgrades_without_confidence"
+    ]
+  }
+}

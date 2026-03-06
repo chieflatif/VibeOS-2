@@ -57,7 +57,7 @@
   },
 
   "phases": {
-    "_comment_ADAPT": "Phase selection: solo=4 phases (session_start, pre_commit, wo_exit, full_audit). small=7 (add wo_entry, wo_exit splits, session_end). enterprise=10 (add post_deploy, component exits).",
+    "_comment_ADAPT": "Phase selection: `wo_exit` is the universal user-facing audit phase. Solo projects use it directly. Small and enterprise projects may add specialized `wo_exit_*` phases, but `wo_exit` should remain available directly or via runner fallback.",
 
     "session_start": {
       "_comment_REQUIRED_for": "all team sizes",

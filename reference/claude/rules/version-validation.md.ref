@@ -9,7 +9,7 @@ AI agents build on training data that may be months or years old. Framework APIs
 
 1. Check the **installed version** — not what you assume from training data
 2. Verify API compatibility with the installed version
-3. Use `scripts/validate-dependency-versions.sh` to detect outdated packages
+3. Use `scripts/validate-dependency-versions.sh` to enforce pinning policy, lockfile policy, and latest-version awareness
 
 ## Common Version Pitfalls
 
@@ -20,12 +20,14 @@ AI agents build on training data that may be months or years old. Framework APIs
 ## Enforcement
 
 ```bash
-# Check for outdated dependencies
+# Check app-oriented dependency version policy
 bash scripts/validate-dependency-versions.sh
 
 # Check for known vulnerabilities
 bash scripts/validate-dependencies.sh
 ```
+
+For application repos, floating dependency declarations should be treated as failures unless the project has explicitly chosen a library-style policy.
 
 ## Rule
 

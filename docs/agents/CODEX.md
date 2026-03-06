@@ -14,6 +14,8 @@ The agent generates `AGENTS.md` from `reference/codex/AGENTS.md.ref`. This file 
 - Quality gate commands
 - Development workflow
 
+For Codex projects, the quality gate manifest lives at `quality-gate-manifest.json` in the project root. `gate-runner.sh` auto-discovers this path.
+
 ## What Works
 
 | Feature | Support |
@@ -38,5 +40,6 @@ Codex cannot:
 After the agent runs AGENT-BOOTSTRAP.md:
 
 - [ ] `AGENTS.md` exists with project-specific content
+- [ ] `quality-gate-manifest.json` exists at the project root
 - [ ] `scripts/` has all gate scripts
 - [ ] `gate-runner.sh pre_commit` runs without crashes

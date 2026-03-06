@@ -81,10 +81,18 @@ else
 fi
 
 # Check 3: Quality gate manifest exists
-MANIFEST_PATH="${MANIFEST_PATH:-$PROJECT_ROOT/.claude/quality-gate-manifest.json}"
+if [[ -z "${MANIFEST_PATH:-}" ]]; then
+  if [[ -f "$PROJECT_ROOT/.claude/quality-gate-manifest.json" ]]; then
+    MANIFEST_PATH="$PROJECT_ROOT/.claude/quality-gate-manifest.json"
+  elif [[ -f "$PROJECT_ROOT/quality-gate-manifest.json" ]]; then
+    MANIFEST_PATH="$PROJECT_ROOT/quality-gate-manifest.json"
+  else
+    MANIFEST_PATH="$PROJECT_ROOT/.claude/quality-gate-manifest.json"
+  fi
+fi
 if [[ -f "$MANIFEST_PATH" ]]; then
   if jq empty "$MANIFEST_PATH" 2>/dev/null; then
-    echo "[$GATE_NAME] PASS: Quality gate manifest valid"
+    echo "[$GATE_NAME] PASS: Quality gate manifest valid ($MANIFEST_PATH)"
   else
     echo "[$GATE_NAME] FAIL: Quality gate manifest is invalid JSON"
     errors=$((errors + 1))

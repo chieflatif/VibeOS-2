@@ -4,23 +4,27 @@
     "name": "Example Django App",
     "slug": "example-django",
     "description": "Web application built with Django",
+    "repo_url": ""
+  },
+  "stack": {
     "language": "python",
     "framework": "django",
     "source_dirs": ["apps"],
     "test_dir": "tests",
     "package_manager": "pip",
-    "database": "postgresql",
-    "cloud_provider": "gcp"
+    "database": "postgresql"
   },
-  "team": {
-    "size": "solo",
+  "governance": {
+    "team_size": "solo",
     "compliance_targets": ["none"],
+    "wo_dir": "docs/planning",
     "frozen_files": [],
     "production_urls": []
   },
   "agent": {
-    "preferred": "cursor",
-    "multi_agent": false
+    "cloud_provider": "gcp",
+    "ci_cd_platform": "none",
+    "mcp_servers": ["none"]
   },
   "architecture_rules": [
     {

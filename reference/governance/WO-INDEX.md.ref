@@ -4,15 +4,15 @@
 
 ## Active Work Orders
 
-| WO | Title | Status | Phase | Owner |
-|----|-------|--------|-------|-------|
-<!-- EXAMPLE: | WO-001 | Initial setup | Active | Phase 1 | @dev | -->
+| WO | Title | Status | Phase | Owner | Evidence |
+|----|-------|--------|-------|-------|----------|
+<!-- EXAMPLE: | WO-001 | Initial setup | Active | Phase 1 | @dev | docs/evidence/WO-001/ | -->
 
 ## Completed Work Orders
 
-| WO | Title | Completed | Summary |
-|----|-------|-----------|---------|
-<!-- Completed WOs move here with date and summary -->
+| WO | Title | Completed | Summary | Evidence |
+|----|-------|-----------|---------|----------|
+<!-- Completed WOs move here with date, summary, and evidence link -->
 
 ## Blocked Work Orders
 

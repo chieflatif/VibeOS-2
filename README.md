@@ -125,6 +125,8 @@ See [docs/PROGRESSIVE-ADOPTION.md](docs/PROGRESSIVE-ADOPTION.md) for details.
 
 - [AGENT-BOOTSTRAP.md](AGENT-BOOTSTRAP.md) — Master playbook (start here for agents)
 - [PROJECT-INTAKE.md](PROJECT-INTAKE.md) — Structured questionnaire
+- [docs/CANONICAL-CONTRACT.md](docs/CANONICAL-CONTRACT.md) — Release A contract source of truth
+- [docs/MIGRATION.md](docs/MIGRATION.md) — Upgrade guidance for generated projects
 - [docs/CORE-PRINCIPLES.md](docs/CORE-PRINCIPLES.md) — Philosophy and design principles
 - [docs/PREREQUISITES.md](docs/PREREQUISITES.md) — Tool installation per OS
 - [docs/PROGRESSIVE-ADOPTION.md](docs/PROGRESSIVE-ADOPTION.md) — Pick-and-choose tiers

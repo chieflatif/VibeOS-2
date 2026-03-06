@@ -157,4 +157,8 @@ if [[ "$MISSING_REQUIRED" -gt 0 ]]; then
     exit 1
 fi
 
+if [[ "$MISSING_RECOMMENDED" -gt 0 ]]; then
+    exit 2
+fi
+
 exit 0

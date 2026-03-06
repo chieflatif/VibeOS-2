@@ -14,6 +14,8 @@ The agent generates `.cursorrules` from `reference/cursor/cursorrules.ref`. This
 - Quality gate commands
 - Evidence-first protocol
 
+For Cursor projects, the quality gate manifest lives at `quality-gate-manifest.json` in the project root. `gate-runner.sh` auto-discovers this path.
+
 ## What Works
 
 | Feature | Support |
@@ -48,6 +50,7 @@ For features Cursor can't enforce via hooks:
 After the agent runs AGENT-BOOTSTRAP.md:
 
 - [ ] `.cursorrules` exists with project-specific content
+- [ ] `quality-gate-manifest.json` exists at the project root
 - [ ] `scripts/` has all gate scripts
 - [ ] `.pre-commit-config.yaml` has pre-commit hooks (compensates for no real-time hooks)
 - [ ] `gate-runner.sh pre_commit` runs without crashes

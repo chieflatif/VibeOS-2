@@ -51,9 +51,9 @@ IF agent_type == "claude-code":
       ENABLE: governance-guard.sh
       CONFIG: BLOCKED_PATTERNS based on compliance level
 
-    IF team_size == "enterprise" OR compliance includes "SOC 2":
+    IF project uses subagents:
       ENABLE: validate-audit-result.sh
-      REASON: enterprise teams and SOC 2 require verified audit outputs
+      REASON: validate subagent audit output before allowing the workflow to proceed
 ```
 
 ### Cursor
@@ -186,11 +186,10 @@ Reference: `reference/claude/settings.json.ref`
         ]
       }
     ],
-    "PostToolUse": [...],
+    "PostToolUseFailure": [...],
     "UserPromptSubmit": [...],
-    "SubagentComplete": [...],
-    "SessionStart": [...],
-    "SessionResume": [...]
+    "SubagentStop": [...],
+    "SessionStart": [...]
   }
 }
 ```

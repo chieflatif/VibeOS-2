@@ -165,11 +165,11 @@ ALWAYS ENABLED (2 core gates):
   - enforce-architecture.sh
 
 CONDITIONAL:
-  IF compliance includes "SOC 2":
+  IF compliance includes "soc2":
     ENABLE: validate-evidence-bundle.sh, validate-audit-completeness.sh, validate-pii-handling.sh
-  IF compliance includes "OWASP":
+  IF compliance includes "owasp":
     ENABLE: validate-owasp-alignment.sh
-  IF compliance includes "GDPR":
+  IF compliance includes "gdpr":
     ENABLE: validate-pii-handling.sh, validate-tenant-isolation.sh
   IF database is "postgresql" OR "mysql" OR "sqlite":
     ENABLE: validate-tenant-isolation.sh
@@ -199,6 +199,8 @@ IF team_size == "small":
 IF team_size == "enterprise":
   PHASES: session_start, wo_entry, pre_commit, wo_exit_backend, wo_exit_frontend, wo_exit_crosscutting, wo_exit_governance, post_deploy, full_audit, session_end
 ```
+
+`wo_exit` remains the universal user-facing audit command. If a generated manifest uses specialized `wo_exit_*` phases, `gate-runner.sh wo_exit` must still work via an explicit `wo_exit` phase or compatibility fallback.
 
 #### 3C: Select Hooks
 Read `decision-engine/hook-selection.md`. Apply rules:
@@ -237,13 +239,13 @@ IF framework is other:
 Read `decision-engine/compliance-mapping.md`. Apply rules:
 
 ```
-IF compliance includes "SOC 2":
+IF compliance includes "soc2":
   REQUIRE: evidence bundles on every WO, audit trail, access logging
   GATES: validate-evidence-bundle (tier 1), validate-audit-completeness (tier 1)
-IF compliance includes "GDPR":
+IF compliance includes "gdpr":
   REQUIRE: PII handling docs, consent tracking, erasure support
   GATES: validate-pii-handling (tier 1), validate-tenant-isolation (tier 1)
-IF compliance includes "OWASP":
+IF compliance includes "owasp":
   REQUIRE: injection prevention, auth checks, XSS prevention
   GATES: validate-owasp-alignment (tier 1), validate-security-patterns (strict)
 IF compliance is ["none"]:
@@ -345,6 +347,10 @@ Also always copy `gate-runner.sh` (the orchestrator).
 #### 4D: Generate Quality Gate Manifest
 Create `{target_project_dir}/.claude/quality-gate-manifest.json` (Claude Code) or
 `{target_project_dir}/quality-gate-manifest.json` (Cursor/Codex).
+
+`gate-runner.sh` must auto-discover manifests in this order:
+1. `.claude/quality-gate-manifest.json`
+2. `quality-gate-manifest.json`
 
 Use `{framework_dir}/reference/manifests/quality-gate-manifest.json.ref` as the pattern.
 Populate with:
@@ -523,7 +529,7 @@ Read reference files from `{framework_dir}/reference/governance/` and GENERATE:
 3. `{target_project_dir}/docs/ADR-TEMPLATE.md` — ADR template
 4. `{target_project_dir}/docs/DESIGN-DOC-TEMPLATE.md` — design document template
 5. `{target_project_dir}/docs/ARCHITECTURE.md` — with project's module structure, architecture rules
-6. `{target_project_dir}/docs/INFRASTRUCTURE-MANIFEST.md` — with sections for the project's cloud provider, database, env vars
+6. `{target_project_dir}/docs/INFRASTRUCTURE-MANIFEST.md` — with sections for the project's cloud provider, database, env vars, MCP servers, and data privacy requirements (when applicable)
 
 #### 5D: Generate Skill Definitions (Claude Code only)
 
@@ -555,6 +561,8 @@ Customize paths and gate names to match the project's manifest.
 - [ ] All hook scripts are executable and pass `bash -n` syntax check
 - [ ] WO-INDEX.md exists with project name
 - [ ] INFRASTRUCTURE-MANIFEST.md exists with correct cloud provider sections
+- [ ] MCP server section is present when `agent.mcp_servers` is not `["none"]`
+- [ ] Data Privacy section is present when compliance includes `gdpr` or the project stores PII
 - [ ] No `{{PLACEHOLDER}}` or `<!-- ADAPT -->` markers remain in any generated file
 
 ### ON FAILURE
@@ -888,7 +896,7 @@ docs/evidence/{WO_NUMBER}/
   },
   "baselines_applied": 0,
   "files_changed": ["list of files"],
-  "compliance_targets": ["SOC 2"]
+  "compliance_targets": ["soc2"]
 }
 ```
 
@@ -936,11 +944,11 @@ Complete settings.json structure for hook wiring:
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/pre-tool/secrets-scan.sh $TOOL_INPUT"
+            "command": ".claude/hooks/pre-tool/secrets-scan.sh"
           },
           {
             "type": "command",
-            "command": "bash .claude/hooks/pre-tool/frozen-files.sh $TOOL_INPUT"
+            "command": ".claude/hooks/pre-tool/frozen-files.sh"
           }
         ]
       },
@@ -949,18 +957,18 @@ Complete settings.json structure for hook wiring:
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/pre-tool/staging-target.sh $TOOL_INPUT"
+            "command": ".claude/hooks/pre-tool/staging-target.sh"
           }
         ]
       }
     ],
-    "PostToolUse": [
+    "PostToolUseFailure": [
       {
         "matcher": ".*",
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/post-tool/capture-failure.sh $TOOL_EXIT_CODE $TOOL_OUTPUT"
+            "command": ".claude/hooks/post-tool/capture-failure.sh"
           }
         ]
       }
@@ -970,37 +978,28 @@ Complete settings.json structure for hook wiring:
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/user-prompt/governance-guard.sh $USER_PROMPT"
+            "command": ".claude/hooks/user-prompt/governance-guard.sh"
           }
         ]
       }
     ],
-    "SubagentComplete": [
+    "SubagentStop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/subagent/validate-audit-result.sh $SUBAGENT_OUTPUT"
+            "command": ".claude/hooks/subagent/validate-audit-result.sh"
           }
         ]
       }
     ],
     "SessionStart": [
       {
+        "matcher": "startup|resume|clear|compact",
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/session/session-start.sh"
-          }
-        ]
-      }
-    ],
-    "SessionResume": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/session/session-resume.sh"
+            "command": ".claude/hooks/session/session-start.sh"
           }
         ]
       }
@@ -1035,7 +1034,7 @@ For each file in `governance.frozen_files`, add to `permissions.deny`:
 
 ## APPENDIX C: QUALITY GATE MANIFEST SCHEMA
 
-The manifest is the central configuration for all gates. Located at `.claude/quality-gate-manifest.json` (Claude Code) or `quality-gate-manifest.json` (project root).
+The manifest is the central configuration for all gates. Located at `.claude/quality-gate-manifest.json` (Claude Code) or `quality-gate-manifest.json` (project root). `gate-runner.sh` auto-discovers both in that order.
 
 ```json
 {

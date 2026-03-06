@@ -185,6 +185,7 @@ OPTIONS:
 DEFAULT: ["none"]
 REQUIRED: yes
 USED_BY: gate selection (compliance-specific gates), tier assignments, evidence requirements, gate-runner strictness
+STORE_AS: soc2 | gdpr | owasp | none
 IMPACT:
   SOC 2: enables evidence-bundle and audit-completeness gates at tier 1
   GDPR: enables pii-handling and tenant-isolation gates at tier 1

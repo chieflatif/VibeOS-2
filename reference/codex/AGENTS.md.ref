@@ -12,6 +12,7 @@
 
 ### Work Order Protocol
 - Track all work in `docs/planning/WO-INDEX.md`
+- Quality gate manifest stored at `quality-gate-manifest.json`
 - Run `bash scripts/gate-runner.sh pre_commit` before every commit
 - Run `bash scripts/gate-runner.sh wo_exit` after completing a Work Order
 - Use commit format: `feat(wo-NNN): description`
