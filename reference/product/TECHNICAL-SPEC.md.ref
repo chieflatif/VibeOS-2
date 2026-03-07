@@ -30,6 +30,30 @@
 - Compliance targets: {{COMPLIANCE_TARGETS}}
 - Audit/logging notes: {{AUDIT_REQUIREMENTS}}
 
+<!-- OPTIONAL: Include when deployment_context is production or above -->
+## Observability & Operations
+<!-- ADAPT: When production+ — logging, metrics, health, alerting -->
+- Logging: structured, correlation IDs
+- Metrics: APM, SLOs
+- Health: DB/Redis readiness probes
+- Alerting: runbooks, on-call
+
+<!-- OPTIONAL: Include when deployment_context is customer-facing or scale -->
+## Resilience & Scale
+<!-- ADAPT: When customer-facing+ — rate limiting, retries, caching, scaling -->
+- Rate limiting
+- Circuit breakers, retries
+- Caching strategy
+- Horizontal scaling (if applicable)
+
+<!-- OPTIONAL: Include when deployment_context is production or above -->
+## Security Hardening
+<!-- ADAPT: When production+ — headers, validation, secrets, audit -->
+- Security headers (CSP, HSTS)
+- Input validation, size limits
+- Secrets management
+- Audit trail for sensitive actions
+
 <!-- REQUIRED -->
 ## Delivery Notes
 <!-- ADAPT -->

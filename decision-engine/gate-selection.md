@@ -1,13 +1,14 @@
 # Gate Selection Decision Tree
 
 ## PURPOSE
-Determine which of the 20 gate scripts to enable based on project config. (gate-runner.sh is always included as the orchestrator.)
+Determine which of the 24 gate scripts to enable based on project config. (gate-runner.sh is always included as the orchestrator.)
 
 ## INPUTS
 - `stack.language`
 - `stack.database`
 - `governance.compliance_targets`
 - `governance.production_urls`
+- `governance.deployment_context` (prototype | production | customer-facing | scale)
 
 ---
 
@@ -94,6 +95,16 @@ IF production_urls is not empty AND production_urls != ["none"]:
 
 IF production_urls is empty OR production_urls == ["none"]:
   SKIP: smoke-test.sh, health-check.sh
+```
+
+### Deployment Context Gates (Production Readiness)
+```
+IF deployment_context IN ["production", "customer-facing", "scale"]:
+  ENABLE: validate-production-readiness.sh   tier=1  blocking=true
+  ENV: PROJECT_DEFINITION=project-definition.json  (or path from project root)
+
+IF deployment_context == "prototype":
+  SKIP: validate-production-readiness.sh  (gate skips when prototype — safe to copy script regardless)
 ```
 
 ---

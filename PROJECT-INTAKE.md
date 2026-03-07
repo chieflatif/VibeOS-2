@@ -215,6 +215,23 @@ IMPACT:
   none: all compliance gates set to tier 3 (advisory only)
 ```
 
+### Q12b: Deployment Context (Production Readiness)
+```
+QUESTION: Will this be deployed, supported, or sold? (affects what we build into the plan)
+TYPE: choice
+AUTO_DERIVE_FIRST: yes
+OPTIONS:
+  - prototype (weekend project, not deploying)
+  - production (deployed, supported, or used in a business — even simple apps)
+  - customer-facing (sold to customers, managed, needs audit trail)
+  - scale (B2B, multi-tenant, high availability)
+DEFAULT: infer from "selling", "deploy", "customers", "enterprise", compliance
+REQUIRED: yes
+USED_BY: development-plan-generation (inject production phases), definition-of-done
+
+When production or above: security headers, health probes, structured logging, input validation are built in. Low overhead.
+```
+
 ### Q13: Work Order Directory
 ```
 QUESTION: Where should Work Order documents be stored?
@@ -307,6 +324,7 @@ CHECKS:
   6. governance.compliance_targets is a non-empty list
   7. IF compliance includes any standard AND team_size == "solo":
      WARN: "Compliance governance with a solo team adds overhead. Recommended: set compliance gates to tier 2 (advisory) until team grows."
+  8. governance.deployment_context is in [prototype, production, customer-facing, scale] when present
 
 IF any required field is missing:
   Ask the specific question again.
@@ -345,6 +363,7 @@ IF all valid:
   "governance": {
     "team_size": "enum: solo|small|enterprise (required)",
     "compliance_targets": ["enum[]: soc2|gdpr|owasp|none (required)"],
+    "deployment_context": "enum: prototype|production|customer-facing|scale (required)",
     "wo_dir": "string (required, relative path)",
     "frozen_files": ["string[] (optional)"],
     "production_urls": ["string[] (optional)"]

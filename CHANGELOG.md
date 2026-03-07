@@ -2,7 +2,29 @@
 
 ## Unreleased
 
+### What's New (Plain English)
+
+- **"How serious is this project?"** — The agent now asks whether you're building a quick prototype, something for real users, or something that needs to scale. That shapes which checks and phases it sets up (e.g. production readiness, monitoring, security).
+- **Risks and assumptions template** — A new template helps you capture open questions, delivery risks, and compliance concerns during discovery.
+- **Project audit report** — A full audit of the framework is documented (workflow, technical consistency, schema alignment).
+- **24 checks** — Three new checks added (including production readiness when you're beyond prototype).
+- **Fixes and polish** — Various fixes to checks, manifest handling, and work-order validation.
+
 ### Added
+- **Production readiness (deployment context)** — Q12b in PROJECT-INTAKE: deployment context (prototype | production | customer-facing | scale). Drives conditional phases in DEVELOPMENT-PLAN: Production Readiness for all non-prototype; Observability, Resilience, Security Hardening for customer-facing/scale. `validate-production-readiness.sh` gate; Production Definition of Done in wo-protocol and CLAUDE.ref.
+- **ASSUMPTIONS-AND-RISKS.md.ref** — Reference template for discovery output (unresolved questions, delivery risks, compliance concerns).
+- **docs/AUDIT-REPORT.md** — Full project audit (workflow, technical, schema consistency).
+
+### Changed
+- **gate-selection.md** — Added deployment_context input and conditional rule for validate-production-readiness.sh. Updated script count to 24.
+- **AGENT-BOOTSTRAP** — Round 3 now 6 questions (deployment context); Phase 2 STORE includes deployment_context; Phase 4C copies validate-production-readiness.sh; Phase 3A includes production-readiness conditional; summary "Gates enabled: of 24".
+- **development-plan-generation** — Input now lists governance_profile.deployment_context.
+- **docs/PLAN.md** — Script count 24; Round 3 includes deployment context; 19 questions total.
+- **Appendix** — scripts/ count updated to 24 gates + gate-runner.
+
+### Added (prior)
+- **Production readiness (deployment context)** — Q12b: Deployment Context (prototype | production | customer-facing | scale) in PROJECT-INTAKE. `validate-production-readiness.sh` gate checks for Production Readiness (and Observability/Resilience/Security for customer-facing/scale) phases in DEVELOPMENT-PLAN. Development plan generation adds conditional phases per deployment_context. See `docs/AUDIT-REPORT.md` and plan at `.cursor/plans/enterprise_readiness_gaps_*.plan.md`.
+- **ASSUMPTIONS-AND-RISKS.md.ref** — Reference template for discovery output (Unresolved Questions, Delivery Risks, Compliance/Data Concerns).
 - **TDD enforcement gates** — `validate-tests-required.sh` blocks when no test files exist; `validate-tests-pass.sh` runs the project's test command and blocks when it fails. Both run in pre_commit and wo_exit (Tier 1). Aligns automation with rules (CLAUDE.md, WO-TEMPLATE, stub-detection) that require tests.
 - **Development plan** — `DEVELOPMENT-PLAN.md` phased roadmap derived from PRD and architecture. Agent never asks "what to build?" — uses the plan. See `decision-engine/development-plan-generation.md`.
 - **validate-development-plan-alignment.sh** — Gate at wo_exit and full_audit. Ensures DEVELOPMENT-PLAN, WO-INDEX, and WO files stay aligned; blocks on drift.

@@ -60,6 +60,7 @@ def title_case_words(text: str) -> str:
 
 
 DEFAULT_IMPACT = {
+    "deployment_context": "high",
     "name": "high",
     "summary": "high",
     "product_type": "high",
@@ -345,6 +346,9 @@ def parse_idea_markdown(path: Path) -> dict[str, Any]:
             "sensitive_data": sensitive_data,
             "compliance_targets": compliance_targets,
         },
+        # _raw_text: full idea file content for infer_deployment_context when merging.
+        # Only set when --idea-file is used; when merging via --existing/--intake only, inference uses summary.
+        "_raw_text": text,
     }
 
 
@@ -460,6 +464,31 @@ def infer_risk_level(sensitive_data: list[str], compliance_targets: list[str]) -
     return "low"
 
 
+def infer_deployment_context(summary: str, text: str, sections: dict[str, str]) -> str:
+    """Infer deployment_context from product description. prototype | production | customer-facing | scale."""
+    explicit = section_text(sections, "deployment context", "deployment", "will this be deployed")
+    if explicit:
+        lowered = explicit.lower().strip()
+        if "prototype" in lowered or "weekend" in lowered or "not deploying" in lowered:
+            return "prototype"
+        if "scale" in lowered or "b2b" in lowered or "multi-tenant" in lowered or "high availability" in lowered:
+            return "scale"
+        if "customer" in lowered or "sold" in lowered or "managed" in lowered or "audit" in lowered:
+            return "customer-facing"
+        if "production" in lowered or "deploy" in lowered or "supported" in lowered:
+            return "production"
+        return "production"  # safe default when user mentions deployment
+
+    lowered = f"{summary}\n{text}".lower()
+    if any(t in lowered for t in ("b2b", "multi-tenant", "high availability", "enterprise", "conferencing")):
+        return "scale"
+    if any(t in lowered for t in ("sold", "customers", "managed", "audit trail", "selling")):
+        return "customer-facing"
+    if any(t in lowered for t in ("deploy", "production", "supported", "business")):
+        return "production"
+    return "prototype"
+
+
 def extract_values(items: list[dict[str, Any]]) -> list[str]:
     return [str(item["value"]) for item in items]
 
@@ -507,6 +536,13 @@ def ensure_defaults(merged: dict[str, Any]) -> dict[str, Any]:
     risk_level = infer_risk_level(sensitive_values, compliance_values)
     governance.setdefault("team_size", "solo")
     governance.setdefault("risk_level", risk_level)
+    if "deployment_context" not in governance:
+        governance["deployment_context"] = evidence_for_field(
+            "deployment_context",
+            infer_deployment_context(str(summary), str(merged.get("_raw_text", "")), {}),
+            source="inferred",
+            confidence="medium",
+        )
 
     if "deployment_shape" not in technical:
         technical["deployment_shape"] = infer_deployment_shape(str(unbox(governance["risk_level"])), platform_values)

@@ -286,8 +286,8 @@ Ask: project name, slug, description, repo URL
 **Round 2 — Technical Stack** (6 questions)
 Ask: language, framework, source dirs, test dir, package manager, database
 
-**Round 3 — Governance Profile** (5 questions)
-Ask: team size, compliance targets, WO dir, frozen files, production URLs
+**Round 3 — Governance Profile** (6 questions)
+Ask: team size, compliance targets, deployment context (Q12b), WO dir, frozen files, production URLs
 
 **Round 4 — Agent Preferences** (3 questions)
 Ask: cloud provider, CI/CD platform, MCP servers
@@ -312,6 +312,7 @@ Ask: cloud provider, CI/CD platform, MCP servers
   "governance": {
     "team_size": "<from Q11>",
     "compliance_targets": ["<from Q12>"],
+    "deployment_context": "<from Q12b>",
     "wo_dir": "<from Q13>",
     "frozen_files": ["<from Q14>"],
     "production_urls": ["<from Q15>"]
@@ -374,6 +375,8 @@ CONDITIONAL:
     ENABLE: validate-tenant-isolation.sh
   IF production_urls is not empty:
     ENABLE: smoke-test.sh, health-check.sh
+  IF deployment_context IN ["production", "customer-facing", "scale"]:
+    ENABLE: validate-production-readiness.sh
 
 ALWAYS ENABLED (infrastructure):
   - validate-infrastructure-manifest.sh
@@ -480,7 +483,7 @@ Language: {stack.language} / {stack.framework}
 Agent: {agent_type}
 Team: {governance.team_size}
 
-Gates enabled: {count} of 20
+Gates enabled: {count} of 24
   Pre-commit: {list}
   WO-exit: {list}
   Full-audit: {list}
@@ -547,7 +550,7 @@ For Cursor: no .claude/ directory. For Codex: no .claude/ directory.
 
 #### 4C: Copy Gate Scripts
 Copy each selected gate script from `{framework_dir}/scripts/` to `{target_project_dir}/scripts/`.
-Always copy: `gate-runner.sh` (orchestrator), `validate-development-plan-alignment.sh` (enforces plan ↔ WO-INDEX alignment), `validate-tests-required.sh` (TDD: blocks when no test files), `validate-tests-pass.sh` (TDD: blocks when tests fail).
+Always copy: `gate-runner.sh` (orchestrator), `validate-development-plan-alignment.sh` (enforces plan ↔ WO-INDEX alignment), `validate-tests-required.sh` (TDD: blocks when no test files), `validate-tests-pass.sh` (TDD: blocks when tests fail), `validate-production-readiness.sh` (checks production phases when deployment_context is production or above; skips when prototype).
 
 #### 4D: Generate Quality Gate Manifest
 Create `{target_project_dir}/.claude/quality-gate-manifest.json` (Claude Code) or
@@ -1098,7 +1101,7 @@ Re-run the bootstrap. It will detect existing config and ask what to update.
 | Directory | Contains | Agent Reads | Agent Copies |
 |---|---|---|---|
 | `PRODUCT-DISCOVERY.md` | Discovery playbook | Yes | No |
-| `scripts/` | 21 scripts (20 gates + gate-runner) | No | Yes — to target project |
+| `scripts/` | 24 gate scripts + gate-runner | No | Yes — to target project |
 | `reference/` | Annotated examples (.ref files) | Yes — for patterns | No — generates from these |
 | `decision-engine/` | Product + governance decision trees | Yes — for setup logic | No |
 | `helpers/` | Utility scripts and project-definition builders | No — calls directly | No |

@@ -163,6 +163,13 @@ Phase N+2: Commit             → Only if audits + gates pass
 Phase N+3: Staging Audit      → Deep self-audit after push/staging
 ```
 
+### Production Definition of Done
+<!-- OPTIONAL: When deployment_context is production, customer-facing, or scale -->
+For deployed applications (deployment_context IN ["production", "customer-facing", "scale"]):
+- The application is NOT "finished" until the Production Readiness phase (and any Observability/Resilience/Security phases for customer-facing/scale) in DEVELOPMENT-PLAN are complete or explicitly deferred in a WO.
+- Before declaring the application done, check: Are all production-readiness WOs Complete or Deferred?
+- If not: "The application is not yet production-ready. Remaining: [list WOs]. Shall I implement them or create deferral WOs?"
+
 ### Single Tracker
 **docs/planning/DEVELOPMENT-PLAN.md** defines the phased roadmap. Determine next WO from the "Next Work Order" section. Never ask the user what to build. All WO status tracked in `docs/planning/WO-INDEX.md`.
 

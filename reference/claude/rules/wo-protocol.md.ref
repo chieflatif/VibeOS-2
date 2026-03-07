@@ -30,6 +30,13 @@ Every Work Order file must contain:
 <!-- ADAPT: Use project's slug -->
 `WO-$PROJECT_SLUG-NNN.md` in `docs/planning/`
 
+## Production Definition of Done
+<!-- OPTIONAL: Include when deployment_context is production, customer-facing, or scale -->
+For deployed applications (deployment_context IN ["production", "customer-facing", "scale"]):
+- The application is NOT "finished" until the Production Readiness phase (and any Observability/Resilience/Security phases for customer-facing/scale) in DEVELOPMENT-PLAN are complete or explicitly deferred in a WO.
+- Before declaring the application done, check: Are all production-readiness WOs Complete or Deferred?
+- If not: "The application is not yet production-ready. Remaining: [list WOs]. Shall I implement them or create deferral WOs?"
+
 ## Development Plan (Canonical Roadmap)
 
 **docs/planning/DEVELOPMENT-PLAN.md** defines phases and ordered Work Orders. The plan is derived from the PRD and architecture.

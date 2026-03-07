@@ -195,6 +195,28 @@
           "env": { "WO_DIR": "docs/planning" }
         },
         {
+          "name": "production-readiness",
+          "script": "scripts/validate-production-readiness.sh",
+          "tier": 1,
+          "_comment_OPTIONAL": "Include when deployment_context is production, customer-facing, or scale",
+          "env": {
+            "WO_DIR": "docs/planning",
+            "DEPLOYMENT_CONTEXT": "",
+            "PROJECT_DEFINITION": "project-definition.json"
+          }
+        },
+        {
+          "name": "production-readiness",
+          "script": "scripts/validate-production-readiness.sh",
+          "tier": 1,
+          "_comment_OPTIONAL": "Include when deployment_context is production, customer-facing, or scale",
+          "env": {
+            "DEPLOYMENT_CONTEXT": "",
+            "WO_DIR": "docs/planning",
+            "PROJECT_DEFINITION": "project-definition.json"
+          }
+        },
+        {
           "name": "logging-patterns",
           "script": "scripts/validate-logging-patterns.sh",
           "tier": 2,

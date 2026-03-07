@@ -65,6 +65,7 @@ Infer a first-pass product definition:
 - likely sensitive data categories
 - likely integration classes
 - likely delivery shape: mobile app, web SaaS, API, internal tool, marketplace
+- likely deployment context: prototype | production | customer-facing | scale (infer from "deploy", "selling", "customers", "enterprise", "B2B", "managed")
 
 ### Step 3: Ask Adaptive Follow-Ups
 
@@ -161,7 +162,8 @@ Do not proceed to the governance bootstrap until these are true:
   },
   "governance_profile": {
     "team_size": {},
-    "risk_level": {}
+    "risk_level": {},
+    "deployment_context": {}
   }
 }
 ```

@@ -185,6 +185,10 @@
         },
         "risk_level": {
           "$ref": "#/$defs/evidenceEnum"
+        },
+        "deployment_context": {
+          "$ref": "#/$defs/evidenceEnum",
+          "description": "prototype | production | customer-facing | scale — drives production-readiness phases in development plan"
         }
       }
     }

@@ -7,7 +7,7 @@ Generate `docs/planning/DEVELOPMENT-PLAN.md` from the PRD, architecture, and pro
 ## Input
 
 - `docs/product/PRD.md`
-- `project-definition.json` (scope.core_workflows, scope.v1_features)
+- `project-definition.json` (scope.core_workflows, scope.v1_features, governance_profile.deployment_context)
 - `docs/ARCHITECTURE.md` or `docs/product/ARCHITECTURE-OUTLINE.md`
 - Existing WO-INDEX (if midstream)
 
@@ -37,6 +37,36 @@ Each phase contains WOs that implement that workflow end-to-end (API, UI, integr
 ### Phase N+1..: V1 Features
 
 Remaining `scope.v1_features` not covered by core workflows. Group by domain or dependency.
+
+### Production Readiness Phases (Conditional on deployment_context)
+
+**IF** `deployment_context IN ["production", "customer-facing", "scale"]` (from governance_profile in project-definition.json):
+
+ADD Phase: Production Readiness (lightweight)
+- WO: Security headers (CSP, HSTS, X-Frame-Options)
+- WO: Health probes (liveness, readiness)
+- WO: Structured logging (request IDs, log levels)
+- WO: Input validation (centralized, size limits)
+
+**IF** `deployment_context IN ["customer-facing", "scale"]`:
+
+ADD Phase: Observability & Operations
+- WO: Structured logging (request IDs, correlation IDs, log levels)
+- WO: Metrics (APM, Prometheus/DataDog, or SLOs)
+- WO: Health probes (DB/Redis readiness beyond /health)
+- WO: Alerting and runbooks (PagerDuty/Opsgenie or equivalent)
+
+ADD Phase: Resilience & Scale
+- WO: Rate limiting (per-user/org, abuse protection)
+- WO: Circuit breakers and retries for external calls (Claude, LinkedIn, etc.)
+- WO: Caching (CDN, HTTP cache headers, Redis beyond tokens)
+- WO: Horizontal scaling (e.g. Socket.io Redis adapter if applicable)
+
+ADD Phase: Security Hardening (beyond production baseline)
+- WO: Secrets management (Vault/AWS Secrets Manager vs env vars)
+- WO: Audit trail (immutable log of sensitive actions)
+
+Each WO gets a number, dependencies, and status like other WOs. They appear in the plan table and "Next Work Order" flows to them. Prototype projects get no extra phases.
 
 ## Work Order Sequencing
 

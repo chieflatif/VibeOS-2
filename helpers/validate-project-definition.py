@@ -87,6 +87,15 @@ def main() -> int:
         validate_evidence(technical.get(field), f"technical_recommendation.{field}", errors)
     for field in ("team_size", "risk_level"):
         validate_evidence(governance.get(field), f"governance_profile.{field}", errors)
+    if governance.get("deployment_context") is not None:
+        dep_ctx = governance["deployment_context"]
+        validate_evidence(dep_ctx, "governance_profile.deployment_context", errors)
+        if is_evidence_object(dep_ctx):
+            val = dep_ctx.get("value")
+            if val not in ("prototype", "production", "customer-facing", "scale"):
+                errors.append(
+                    "governance_profile.deployment_context.value must be one of: prototype, production, customer-facing, scale"
+                )
 
     validate_list(scope, "core_workflows", errors)
     validate_list(scope, "v1_features", errors)

@@ -25,7 +25,7 @@
 2. User creates/opens their project folder in Claude Code / Cursor / Codex
 3. User says: "Set up VibeOS using ~/VibeOS-2"
 4. Agent reads AGENT-BOOTSTRAP.md (the master playbook)
-5. Agent asks 18 structured questions across 4 rounds (PROJECT-INTAKE.md)
+5. Agent asks 19 structured questions across 4 rounds (PROJECT-INTAKE.md)
 6. Agent makes decisions: which gates, which hooks, which rules, which phases
 7. Agent copies scripts, renders templates, wires hooks, creates manifests
 8. Agent scans existing codebase → adapts architecture rules → documents baselines
@@ -39,7 +39,7 @@
 
 | Pattern | Source | Why |
 |---|---|---|
-| 21 gate scripts (all working) | SIP + SS + new | Complete quality gate coverage |
+| 24 gate scripts (all working) | SIP + SS + new | Complete quality gate coverage |
 | 8 hook templates | SalesSidekick | Real-time governance (secrets, frozen files, staging safety, session lifecycle) |
 | settings.json template | SalesSidekick | Hook wiring — without this, hooks don't fire |
 | 7 gate phases | SalesSidekick | session_start → wo_entry → pre_commit → wo_exit → post_deploy → full_audit → session_end |
@@ -70,7 +70,7 @@ enterprise-dev-framework/
 │
 │── # THE ENTRY POINTS (agent reads these first)
 ├── AGENT-BOOTSTRAP.md              ← Master playbook: 7-phase agent-driven setup
-├── PROJECT-INTAKE.md               ← 18-question intake across 4 rounds
+├── PROJECT-INTAKE.md               ← 19-question intake across 4 rounds
 ├── README.md                       ← Human-readable overview + "how to use"
 ├── LICENSE (MIT)
 ├── CHANGELOG.md
@@ -198,14 +198,14 @@ The core innovation. This is what the agent reads first. Written in agent-execut
 - INPUT: This repo's file structure
 - ACTION: Read AGENT-BOOTSTRAP.md, scan repo structure, identify agent type (Claude/Cursor/Codex)
 - STORE: Agent type, framework version, available scripts list
-- VERIFY: Agent can list all 21 gate scripts and identify its own config format
+- VERIFY: Agent can list all 24 gate scripts and identify its own config format
 
 **Phase 2: Project Intake**
 - INPUT: PROJECT-INTAKE.md questionnaire
-- ACTION: Ask user 18 questions across 4 rounds:
+- ACTION: Ask user 19 questions across 4 rounds:
   - Round 1 (Identity): project name, slug, description, repo URL
   - Round 2 (Stack): language, framework, source dirs, test dir, package manager, database
-  - Round 3 (Governance): team size, compliance targets (`soc2`/`gdpr`/`owasp`/`none`), WO dir, frozen files, production URLs
+  - Round 3 (Governance): team size, compliance targets (`soc2`/`gdpr`/`owasp`/`none`), deployment context (prototype|production|customer-facing|scale), WO dir, frozen files, production URLs
   - Round 4 (Agent): cloud provider, CI/CD platform, MCP servers
 - STORE: Project config (structured JSON)
 - VERIFY: All required fields populated, source dirs exist
@@ -214,7 +214,7 @@ The core innovation. This is what the agent reads first. Written in agent-execut
 - INPUT: Project config from Phase 2 + decision trees in `decision-engine/`
 - ACTION: Select gates, phases, hooks, rules, architecture config based on answers
 - DECISIONS:
-  - Gates: All 20 always available. Pre-commit (4) always on. WO-exit gates selected by stack. Full-audit gates selected by compliance targets.
+  - Gates: All 24 always available. Pre-commit (6) always on. WO-exit gates selected by stack. Full-audit gates selected by compliance targets. Production-readiness gate when deployment_context is production or above.
   - Phases: Solo dev → 4 phases (pre_commit, wo_exit, full_audit, session_start). Team → 7 phases (add wo_entry, component exits, session_end). Enterprise → 10 phases (add post_deploy, wo_exit_governance).
   - Hooks: Claude Code → current hook contract via stdin JSON (`PreToolUse`, `PostToolUseFailure`, `UserPromptSubmit`, `SessionStart`, `SubagentStop`). Cursor/Codex → no runtime hooks, governance embedded in `.cursorrules` / `AGENTS.md`.
   - Architecture rules: FastAPI → API purity + router isolation. Django → app isolation + ORM enforcement. Express → middleware isolation + async patterns.
