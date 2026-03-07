@@ -121,6 +121,16 @@ For setup milestones, WO planning, implementation updates, audits, and WO comple
 <!-- REQUIRED -->
 No `NotImplementedError`, no `pass`-only functions, no `# TODO` in committed code. If it can't be implemented fully, flag it as a blocker.
 
+### Upgrade VibeOS (Voice-Driven)
+<!-- REQUIRED: When user says upgrade, get latest, or update governance -->
+When the user says "Upgrade VibeOS", "Get the latest governance", "Update VibeOS", or similar:
+1. **If they give a URL** (e.g. `https://github.com/chieflatif/VibeOS-2` or `chieflatif/VibeOS-2`): Clone or pull that repo to `~/.vibeos-cache/VibeOS-2`, then run `bash ~/.vibeos-cache/VibeOS-2/helpers/fetch-and-upgrade.sh . [url]`. Use the current workspace as the target.
+2. **If they give a path** (e.g. `~/VibeOS-2`): Run `bash {path}/helpers/upgrade.sh .`.
+3. **If neither**: Ask "Give me the VibeOS repo URL (e.g. https://github.com/chieflatif/VibeOS-2) or the path where you have it cloned."
+4. **After upgrade**: Summarize what changed from the framework's CHANGELOG (Unreleased section) so the user understands the new capabilities.
+
+You handle everything — no manual git pull or script running. The user just says what they want.
+
 ## Development Workflow
 
 <!-- ADAPT: Agent generates from language/framework/package manager -->

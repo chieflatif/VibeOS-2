@@ -11,9 +11,14 @@ You are turning a rough project idea into a product definition, technical founda
 Correct flow: (1) User creates empty project folder (or opens existing project), (2) opens it in Claude Code/Cursor/Codex, (3) says "Set up VibeOS" and gives path to VibeOS-2, (4) governance installs into current folder.
 
 1. **target_project_dir = current workspace** — The folder the user has open. All outputs go here.
-2. **framework_dir = path user provides** — Ask if needed: "Where is your VibeOS-2 folder? (e.g. ~/VibeOS-2)"
+2. **framework_dir or VibeOS URL** — User may provide: (a) local path (e.g. ~/VibeOS-2), or (b) repo URL (e.g. https://github.com/chieflatif/VibeOS-2 or chieflatif/VibeOS-2). If neither, ask: "Where is VibeOS-2? Give me the path or the GitHub URL."
 3. **Verify:** framework_dir must contain AGENT-BOOTSTRAP.md, scripts/, reference/
-4. **Detect project mode:** Scan target for source files in common dirs (src/, lib/, app/, packages/, or project root). If any `.py`, `.ts`, `.js`, `.go`, `.rs`, `.java` files exist → **existing_project = true** (midstream embedding). Else → **existing_project = false** (greenfield).
+4. **Detect upgrade vs install:** If user says "upgrade", "update", "get latest", or "refresh" governance, AND target has `scripts/gate-runner.sh` and a manifest → **upgrade_mode = true**.
+   - **If user gave a URL:** (1) Clone to ~/.vibeos-cache/VibeOS-2 if not present, or `git pull` there if present. (2) Run `bash ~/.vibeos-cache/VibeOS-2/helpers/fetch-and-upgrade.sh {target_project_dir} {url}`. The script pulls latest and runs upgrade. Shorthand OK: `chieflatif/VibeOS-2` → `https://github.com/chieflatif/VibeOS-2`.
+   - **If user gave a path:** Run `bash {framework_dir}/helpers/upgrade.sh {target_project_dir}`. Optionally `cd {framework_dir} && git pull` first to get latest.
+   - After upgrade: Read CHANGELOG from framework and summarize "Here's what's new" for the user.
+   - Skip to Phase 7 verification. Else → **upgrade_mode = false**.
+5. **Detect project mode:** Scan target for source files in common dirs (src/, lib/, app/, packages/, or project root). If any `.py`, `.ts`, `.js`, `.go`, `.rs`, `.java` files exist → **existing_project = true** (midstream embedding). Else → **existing_project = false** (greenfield).
 
 ### STORE
 ```json

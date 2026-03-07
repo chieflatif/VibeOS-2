@@ -9,6 +9,7 @@
 - **Midstream embedding** — Bootstrap detects existing projects, runs audit-first flow, explains audit→issues→WOs→implement→audit loop, creates WOs from findings.
 - **Environment discovery** — `helpers/verify-environment.sh` discovers tools, GitHub, hosting. Phase 1.5 presents findings, walks user through config when missing.
 - **Target-project invocation** — Bootstrap runs FROM the user's project folder; user provides path to VibeOS-2. No context switching.
+- **Upgrade flow** — `helpers/upgrade.sh` upgrades existing projects: copies new scripts, merges new gates into manifest, preserves baselines. Say "Upgrade VibeOS using ~/VibeOS-2" when in your project. See `docs/UPGRADE.md`.
 
 ### Changed
 - Stabilized the framework contract with `docs/CANONICAL-CONTRACT.md` and `docs/canonical-contract.json`.

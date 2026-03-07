@@ -196,7 +196,9 @@ See [docs/PROGRESSIVE-ADOPTION.md](docs/PROGRESSIVE-ADOPTION.md) for details.
 - [docs/project-definition.schema.json](docs/project-definition.schema.json) — Canonical product-definition schema
 - [docs/USER-COMMUNICATION-CONTRACT.md](docs/USER-COMMUNICATION-CONTRACT.md) — Business-first communication rules for agents
 - [docs/CANONICAL-CONTRACT.md](docs/CANONICAL-CONTRACT.md) — Release A contract source of truth
-- [docs/MIGRATION.md](docs/MIGRATION.md) — Upgrade guidance for generated projects
+- [docs/UPGRADE.md](docs/UPGRADE.md) — Upgrade existing projects to latest framework
+- [docs/AGENT-UPGRADE-PROTOCOL.md](docs/AGENT-UPGRADE-PROTOCOL.md) — Voice-driven upgrade: agent instructions for "Upgrade VibeOS"
+- [docs/MIGRATION.md](docs/MIGRATION.md) — Compatibility guidance for generated projects
 - [docs/CORE-PRINCIPLES.md](docs/CORE-PRINCIPLES.md) — Philosophy and design principles
 - [docs/PREREQUISITES.md](docs/PREREQUISITES.md) — Tool installation per OS
 - [docs/PROGRESSIVE-ADOPTION.md](docs/PROGRESSIVE-ADOPTION.md) — Pick-and-choose tiers
