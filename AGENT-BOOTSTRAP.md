@@ -378,6 +378,8 @@ ALWAYS ENABLED (infrastructure):
   - validate-documentation-completeness.sh
   - validate-test-integrity.sh
   - validate-dependencies.sh
+  - validate-tests-required.sh   ← TDD: blocks when no test files
+  - validate-tests-pass.sh      ← TDD: blocks when test command fails
 ```
 
 #### 3B: Select Gate Phases
@@ -540,7 +542,7 @@ For Cursor: no .claude/ directory. For Codex: no .claude/ directory.
 
 #### 4C: Copy Gate Scripts
 Copy each selected gate script from `{framework_dir}/scripts/` to `{target_project_dir}/scripts/`.
-Always copy: `gate-runner.sh` (orchestrator), `validate-development-plan-alignment.sh` (enforces plan ↔ WO-INDEX alignment).
+Always copy: `gate-runner.sh` (orchestrator), `validate-development-plan-alignment.sh` (enforces plan ↔ WO-INDEX alignment), `validate-tests-required.sh` (TDD: blocks when no test files), `validate-tests-pass.sh` (TDD: blocks when tests fail).
 
 #### 4D: Generate Quality Gate Manifest
 Create `{target_project_dir}/.claude/quality-gate-manifest.json` (Claude Code) or

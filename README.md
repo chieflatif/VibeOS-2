@@ -70,7 +70,7 @@ This behavior is part of the framework, not a nice-to-have reminder.
 
 | Component | Count | Description |
 |-----------|-------|-------------|
-| Gate Scripts | 22 | Security, quality, architecture, compliance, **development plan alignment** |
+| Gate Scripts | 24 | Security, quality, **TDD enforcement**, architecture, compliance, development plan alignment |
 | Gate Phases | Up to 10 | session_start through session_end |
 | Discovery Playbooks | 2 | Product discovery + governance bootstrap |
 | Hook Templates | 8 | Real-time guardrails (secrets, frozen files, staging safety) |
@@ -127,13 +127,15 @@ docs/project-definition.schema.json ← Canonical discovery contract
 docs/                           ← Documentation + guides
 ```
 
-## Gate Scripts (22)
+## Gate Scripts (24)
 
-### Pre-Commit (4) — Run before every commit
+### Pre-Commit (6) — Run before every commit
 - **validate-no-secrets.sh** — AWS keys, API tokens, JWTs, PEM keys
 - **validate-security-patterns.sh** — eval, exec, pickle, shell=True, verify=False
 - **detect-stubs-placeholders.py** — NotImplementedError, TODO, empty functions
 - **validate-code-quality.sh** — Language-aware linting (ruff, eslint, go vet, clippy)
+- **validate-tests-required.sh** — TDD: blocks when no test files exist
+- **validate-tests-pass.sh** — TDD: runs test command, blocks when tests fail
 
 ### WO-Exit (5) — Run after completing a Work Order
 - **enforce-architecture.sh** — Config-driven module boundary enforcement

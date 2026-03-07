@@ -76,6 +76,17 @@ Focus on:
 - rollback readiness
 - follow-up work before production
 
+## TDD Requirement (Every Checkpoint)
+
+Every audit checkpoint **must** explicitly address tests. No checkpoint passes without answering:
+
+- **Planning:** What tests are required for this WO? Unit, integration, e2e?
+- **Pre-implementation:** Is the test strategy complete? What will we run before commit?
+- **Pre-commit:** Do all new/changed paths have tests? Do tests pass?
+- **Staging:** Are tests green? Any test gaps before release?
+
+A WO cannot be considered complete if any checkpoint omits or defers the test question.
+
 ## Required Output Format
 
 For each checkpoint, record:
@@ -86,4 +97,5 @@ For each checkpoint, record:
 - required fixes
 - accepted risks
 - evidence or commands run
+- **test status** — what tests exist, what passed, what gaps remain
 - whether an extra user-requested audit was recommended

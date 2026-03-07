@@ -18,9 +18,12 @@ Phase N+3: Staging Audit      → Deep self-audit after push/staging before next
 
 Every Work Order file must contain:
 1. **Objective** — What and why
-2. **Acceptance Criteria** — Definition of done
-3. **Tasks/Phases** — Implementation breakdown
-4. **Status** — Current state (`Draft` → `Active - Phase 0` → `Internally Audited` → `Presented` → `Accepted - Awaiting Entry Audit` → `Implementation Ready` → `Active - Phase 1`/`In Progress` → `Complete`/`Shipped`/`Blocked`)
+2. **Acceptance Criteria** — Definition of done (must include tests)
+3. **Test Strategy** — What will be tested, how, and where (required before implementation)
+4. **Tasks/Phases** — Implementation breakdown (tests in every phase)
+5. **Status** — Current state (`Draft` → `Active - Phase 0` → `Internally Audited` → `Presented` → `Accepted - Awaiting Entry Audit` → `Implementation Ready` → `Active - Phase 1`/`In Progress` → `Complete`/`Shipped`/`Blocked`)
+
+**TDD is built into the WO.** No WO can pass entry or completion validation without a Test Strategy and test evidence. The `validate-work-order` gate enforces this. **Exception:** Documentation-only or config-only WOs (no code changes) may waive the test requirement by stating "N/A — documentation-only" or "Waived — no code changes" in the Test Strategy section.
 
 ## WO File Naming
 

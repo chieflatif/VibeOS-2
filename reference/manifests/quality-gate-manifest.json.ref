@@ -114,6 +114,29 @@
             "SOURCE_DIR": "",
             "LANGUAGE": ""
           }
+        },
+        {
+          "name": "tests-required",
+          "script": "scripts/validate-tests-required.sh",
+          "tier": 1,
+          "_comment": "REQUIRED for TDD: Blocks when no test files exist. Use known_baselines for existing projects during adoption.",
+          "env": {
+            "_comment_ADAPT": "Set TEST_DIR, SOURCE_DIR, LANGUAGE from project config",
+            "TEST_DIR": "",
+            "SOURCE_DIR": "",
+            "LANGUAGE": ""
+          }
+        },
+        {
+          "name": "tests-pass",
+          "script": "scripts/validate-tests-pass.sh",
+          "tier": 1,
+          "_comment": "REQUIRED for TDD: Runs test command, blocks when tests fail. Set TEST_CMD to override auto-detected command.",
+          "env": {
+            "_comment_ADAPT": "Set TEST_CMD to override (e.g. pnpm test, pytest). Optional: LANGUAGE, PROJECT_ROOT",
+            "TEST_CMD": "",
+            "LANGUAGE": ""
+          }
         }
       ]
     },
@@ -192,6 +215,18 @@
             "LANGUAGE": "",
             "MIN_DOCSTRING_PCT": "50"
           }
+        },
+        {
+          "name": "tests-required",
+          "script": "scripts/validate-tests-required.sh",
+          "tier": 1,
+          "env": { "TEST_DIR": "", "SOURCE_DIR": "", "LANGUAGE": "" }
+        },
+        {
+          "name": "tests-pass",
+          "script": "scripts/validate-tests-pass.sh",
+          "tier": 1,
+          "env": { "TEST_CMD": "", "LANGUAGE": "" }
         }
       ]
     },
@@ -297,7 +332,8 @@
         {
           "name": "test-integrity",
           "script": "scripts/validate-test-integrity.sh",
-          "tier": 2,
+          "tier": 1,
+          "_comment": "Upgraded to tier 1 for TDD: checks vacuous assertions, empty tests. tests-required + tests-pass enforce presence and pass.",
           "env": {
             "_comment_ADAPT": "Set TEST_DIR and SOURCE_DIR",
             "TEST_DIR": "",

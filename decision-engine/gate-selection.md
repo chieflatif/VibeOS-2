@@ -16,11 +16,13 @@ Determine which of the 20 gate scripts to enable based on project config. (gate-
 These gates are enabled for every project regardless of config:
 
 ```
-PRE-COMMIT (4 gates — always on):
-  validate-no-secrets.sh          tier=1  blocking=true
-  validate-security-patterns.sh   tier=1  blocking=true
+PRE-COMMIT (6 gates — always on):
+  validate-no-secrets.sh          tier=0  blocking=true
+  validate-security-patterns.sh   tier=0  blocking=true
   detect-stubs-placeholders.py    tier=1  blocking=true
-  validate-code-quality.sh        tier=2  blocking=true
+  validate-code-quality.sh        tier=1  blocking=true
+  validate-tests-required.sh      tier=1  blocking=true   ← TDD: blocks when no test files
+  validate-tests-pass.sh          tier=1  blocking=true   ← TDD: blocks when test command fails
 
 CORE (5 gates — always on):
   validate-work-order.sh                  tier=1  blocking=true
@@ -33,7 +35,7 @@ INFRASTRUCTURE (4 gates — always on):
   validate-infrastructure-manifest.sh  tier=2  blocking=false
   validate-dependency-versions.sh      tier=2  blocking=true
   validate-session-start.sh            tier=0  blocking=false
-  validate-test-integrity.sh           tier=2  blocking=false
+  validate-test-integrity.sh           tier=2  blocking=false  (quality of existing tests; tests-required enforces presence)
 
 DEPENDENCIES (1 gate — always on):
   validate-dependencies.sh             tier=2  blocking=false

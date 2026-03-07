@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- **TDD enforcement gates** — `validate-tests-required.sh` blocks when no test files exist; `validate-tests-pass.sh` runs the project's test command and blocks when it fails. Both run in pre_commit and wo_exit (Tier 1). Aligns automation with rules (CLAUDE.md, WO-TEMPLATE, stub-detection) that require tests.
 - **Development plan** — `DEVELOPMENT-PLAN.md` phased roadmap derived from PRD and architecture. Agent never asks "what to build?" — uses the plan. See `decision-engine/development-plan-generation.md`.
 - **validate-development-plan-alignment.sh** — Gate at wo_exit and full_audit. Ensures DEVELOPMENT-PLAN, WO-INDEX, and WO files stay aligned; blocks on drift.
 - **Midstream embedding** — Bootstrap detects existing projects, runs audit-first flow, explains audit→issues→WOs→implement→audit loop, creates WOs from findings.
@@ -23,6 +24,7 @@
 - Brought governance templates into line with compliance docs by adding evidence, cloud provider, MCP, and data-privacy sections.
 - Session start REQUIRED_DOCS now includes DEVELOPMENT-PLAN.md and WO-INDEX.md.
 - validate-audit-completeness.sh now checks for DEVELOPMENT-PLAN.md and "Next Work Order" section.
+- **TDD in Work Orders** — Test Strategy is a required WO section (before implementation). validate-work-order.sh enforces: (1) Test Strategy exists with substantive content for entry/completion, (2) Evidence must reference tests for completion. WO-TEMPLATE, wo-protocol, and WO-AUDIT-FRAMEWORK updated so every WO is a governed document that cannot complete without tests.
 
 ## v1.0.0 (2026-03-05)
 

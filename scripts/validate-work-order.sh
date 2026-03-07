@@ -29,6 +29,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     echo "Validates that a WO file has required sections:"
     echo "  - Objective or Scope"
     echo "  - Acceptance Criteria or Definition of Done"
+    echo "  - Test Strategy (TDD: required before implementation)"
     echo "  - Tasks or Phase"
     echo "  - Status field"
     echo ""
@@ -92,6 +93,16 @@ section_block() {
     '
 }
 
+# For ##-level sections (Test Strategy, Evidence) — stop at next ##, not ###
+section_block_h2() {
+    local heading="$1"
+    printf '%s\n' "$content" | awk -v heading="$heading" '
+        index(tolower($0), tolower(heading)) > 0 && /^##[[:space:]]/ { flag=1; next }
+        /^##[[:space:]]/ && flag { exit }
+        flag { print }
+    '
+}
+
 require_audit_complete() {
     local heading="$1"
     local label="$2"
@@ -124,6 +135,32 @@ fi
 # Check 4: Status field (in YAML frontmatter or as a heading/field)
 if ! echo "$content" | grep -qiE '(^status:|^#{1,3}\s+Status|Status:\s+)'; then
     errors+=("Missing 'status' field")
+fi
+
+# Check 5: Test Strategy section (TDD — required for code WOs; can be waived for docs/config-only)
+test_strategy_block="$(section_block_h2 "Test Strategy")"
+test_requirement_waived=false
+if [[ -z "$test_strategy_block" ]]; then
+    errors+=("Missing 'Test Strategy' section — define tests or explicitly waive (e.g. N/A — documentation-only)")
+elif echo "$test_strategy_block" | grep -qiE '(N/A|waived|documentation-only|docs-only|no code changes|config-only|no tests required)'; then
+    # Explicit waiver — must state reason (documentation, config, etc.)
+    test_requirement_waived=true
+elif [[ "$WO_VALIDATION_MODE" == "entry" || "$WO_VALIDATION_MODE" == "completion" ]]; then
+    # Must have substantive content (not just placeholders)
+    non_placeholder=$(printf '%s\n' "$test_strategy_block" | grep -v '^\s*$' | grep -v '^\s*<!--' | grep -v '^\s*-\s*$' | grep -v '^\s*$' || true)
+    if [[ -z "$non_placeholder" ]] || [[ $(printf '%s\n' "$non_placeholder" | wc -l | tr -d ' ') -lt 2 ]]; then
+        errors+=("'Test Strategy' must have substantive content — or explicitly waive (e.g. N/A — documentation-only)")
+    fi
+fi
+
+# Check 6: For completion — Evidence must reference tests (unless waived)
+if [[ "$WO_VALIDATION_MODE" == "completion" ]] && [[ "$test_requirement_waived" != "true" ]]; then
+    evidence_block="$(section_block_h2 "Evidence")"
+    if [[ -z "$evidence_block" ]]; then
+        errors+=("Missing 'Evidence' section — required for WO completion")
+    elif ! echo "$evidence_block" | grep -qiE '(test|pytest|jest|vitest|coverage|gate-runner|wo_exit)'; then
+        errors+=("'Evidence' must reference test results or gate output — TDD requires test evidence for completion")
+    fi
 fi
 
 if [[ "$WO_VALIDATION_MODE" == "entry" ]]; then

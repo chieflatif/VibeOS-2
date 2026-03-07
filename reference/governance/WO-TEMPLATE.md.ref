@@ -17,6 +17,7 @@
 
 - [ ] <!-- Criterion 1 -->
 - [ ] <!-- Criterion 2 -->
+- [ ] Tests written and passing (or N/A — documentation/config-only WO)
 - [ ] All quality gates pass (`bash scripts/gate-runner.sh wo_exit`)
 
 ## Dependencies
@@ -26,6 +27,17 @@
 ## Impact Analysis
 
 <!-- What existing functionality could be affected? -->
+
+## Test Strategy <!-- REQUIRED: Define tests, or explicitly waive if no code changes. -->
+
+<!-- For code WOs: define what will be tested and how. For docs/config-only WOs: use the waiver below. -->
+- **Unit tests:** <!-- Which functions/modules? What cases? (or N/A) -->
+- **Integration tests:** <!-- Which routes/APIs/flows? (or N/A) -->
+- **Fixtures/mocks:** <!-- What test data or mocks are needed? (or N/A) -->
+- **Coverage target:** <!-- Minimum coverage for new code (e.g. 80%) (or N/A) -->
+
+<!-- OPTIONAL waiver — use only when WO has no code changes (e.g. documentation, README, config-only): -->
+<!-- **Waived:** N/A — documentation-only WO. No code changes. Test requirement does not apply. -->
 
 ## Audit Loop
 
@@ -77,7 +89,7 @@ Use `docs/planning/WO-AUDIT-FRAMEWORK.md` as the standard prompt set. Every chec
 
 - [ ] Dependency mapping
 - [ ] Impact analysis
-- [ ] Test strategy
+- [ ] **Test Strategy section completed** (required before Phase 1)
 - [ ] Planning self-audit completed
 - [ ] Pre-implementation deep audit completed
 
@@ -85,7 +97,7 @@ Use `docs/planning/WO-AUDIT-FRAMEWORK.md` as the standard prompt set. Every chec
 
 - [ ] <!-- Task 1 -->
 - [ ] <!-- Task 2 -->
-- [ ] Unit tests
+- [ ] **Tests written first or alongside code** (or N/A if documentation/config-only)
 
 ### Phase 2: Audit
 
@@ -97,7 +109,9 @@ Use `docs/planning/WO-AUDIT-FRAMEWORK.md` as the standard prompt set. Every chec
 
 ## Evidence
 
-<!-- Links to test results, gate output, screenshots -->
+<!-- REQUIRED: Every WO must include test evidence. -->
+- **Test results:** <!-- Output of test command (pytest, jest, go test, etc.) or link -->
+- **Gate output:** <!-- gate-runner.sh wo_exit output showing tests pass -->
 
 ### Evidence Location
 
