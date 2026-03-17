@@ -34,6 +34,11 @@
           "name": "security-patterns",
           "script": "scripts/validate-security-patterns.sh",
           "tier": 0
+        },
+        {
+          "name": "swallowed-errors",
+          "script": "scripts/validate-swallowed-errors.sh",
+          "tier": 1
         }
       ]
     },

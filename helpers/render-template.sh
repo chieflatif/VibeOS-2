@@ -5,7 +5,7 @@
 #        bash render-template.sh <template_file> <output_file> KEY1=VALUE1 KEY2=VALUE2 ...
 set -euo pipefail
 
-FRAMEWORK_VERSION="1.0.0"
+FRAMEWORK_VERSION="2.0.0"
 SCRIPT_NAME="render-template"
 
 usage() {

@@ -17,7 +17,7 @@
 #   2 = Invalid arguments
 set -euo pipefail
 
-FRAMEWORK_VERSION="1.0.0"
+FRAMEWORK_VERSION="2.0.0"
 SCRIPT_NAME="upgrade"
 
 usage() {
@@ -33,6 +33,8 @@ Environment:
 
 What gets updated:
   - Scripts: All gate scripts and gate-runner.sh (overwritten — they are framework-managed)
+  - Convergence: Loop control scripts (state hash, convergence, baselines, findings lifecycle)
+  - Decision engine: Decision tree files (overwritten — they are framework-managed)
   - Manifest: New gates added to your phases; your baselines and env preserved
 
 What is preserved:
@@ -106,7 +108,45 @@ done
 echo "[$SCRIPT_NAME] Scripts: $COPIED file(s) updated"
 echo ""
 
-# --- 2. Merge manifest (add new gates) ---
+# --- 2. Copy convergence scripts ---
+if [[ -d "$FRAMEWORK_DIR/convergence" ]]; then
+  mkdir -p "$TARGET_DIR/convergence"
+  CONV_COPIED=0
+  for f in "$FRAMEWORK_DIR"/convergence/*.sh; do
+    [[ -f "$f" ]] || continue
+    name=$(basename "$f")
+    if [[ "$DRY_RUN" == "true" ]]; then
+      echo "[$SCRIPT_NAME] Would copy: convergence/$name"
+    else
+      cp "$f" "$TARGET_DIR/convergence/$name"
+      echo "[$SCRIPT_NAME] Copied: convergence/$name"
+    fi
+    CONV_COPIED=$((CONV_COPIED + 1))
+  done
+  echo "[$SCRIPT_NAME] Convergence: $CONV_COPIED file(s) updated"
+  echo ""
+fi
+
+# --- 3. Copy decision engine files ---
+if [[ -d "$FRAMEWORK_DIR/decision-engine" ]]; then
+  mkdir -p "$TARGET_DIR/decision-engine"
+  DE_COPIED=0
+  for f in "$FRAMEWORK_DIR"/decision-engine/*.md; do
+    [[ -f "$f" ]] || continue
+    name=$(basename "$f")
+    if [[ "$DRY_RUN" == "true" ]]; then
+      echo "[$SCRIPT_NAME] Would copy: decision-engine/$name"
+    else
+      cp "$f" "$TARGET_DIR/decision-engine/$name"
+      echo "[$SCRIPT_NAME] Copied: decision-engine/$name"
+    fi
+    DE_COPIED=$((DE_COPIED + 1))
+  done
+  echo "[$SCRIPT_NAME] Decision engine: $DE_COPIED file(s) updated"
+  echo ""
+fi
+
+# --- 4. Merge manifest (add new gates) ---
 PROJECT_MANIFEST=""
 for candidate in "$TARGET_DIR/.claude/quality-gate-manifest.json" "$TARGET_DIR/quality-gate-manifest.json"; do
   if [[ -f "$candidate" ]]; then

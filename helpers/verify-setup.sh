@@ -4,7 +4,7 @@
 # Usage: bash verify-setup.sh <target_project_dir>
 set -euo pipefail
 
-FRAMEWORK_VERSION="1.0.0"
+FRAMEWORK_VERSION="2.0.0"
 SCRIPT_NAME="verify-setup"
 
 # Colors

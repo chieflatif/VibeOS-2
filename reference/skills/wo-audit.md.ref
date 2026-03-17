@@ -37,7 +37,7 @@ User types `/wo-audit` or asks for a WO audit at planning, pre-implementation, p
    - Update `WO-INDEX.md` audit-loop status if needed
 7. **Report back using this structure**
    - Executive summary: what matters most in plain English
-   - Technical explanation: what was checked and why the findings exist (explain any technical terms)
+   - Technical explanation: what was checked and why the findings exist (use the real term and explain it in plain language, e.g. "WO (work order)")
    - Decision guidance: what must be fixed now vs what can wait — with pros/cons and a clear recommendation based on evidence
    - Recommended next step: what should happen next and why
 

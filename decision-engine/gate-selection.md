@@ -1,7 +1,7 @@
 # Gate Selection Decision Tree
 
 ## PURPOSE
-Determine which of the 24 gate scripts to enable based on project config. (gate-runner.sh is always included as the orchestrator.)
+Determine which of the 42 gate scripts to enable based on project config. (gate-runner.sh is always included as the orchestrator.)
 
 ## INPUTS
 - `stack.language`
@@ -42,11 +42,67 @@ DEPENDENCIES (1 gate — always on):
   validate-dependencies.sh             tier=2  blocking=false
 ```
 
-Total always-on: 13 gates
+QUALITY & ARCHITECTURE (3 gates — always on):
+  validate-code-complexity.sh        tier=2  blocking=false   ← function length, cyclomatic complexity, god objects
+  validate-dev-environment.sh        tier=3  blocking=false   ← README, lockfile, CI config, task runner
+  test-quality-gate.sh               tier=2  blocking=false   ← mock density, TDD compliance
+
+VERIFICATION INTEGRITY (4 gates — always on, new in v2.0):
+  validate-worktree-freshness.sh     tier=0  blocking=true    ← audit worktree staleness detection
+  detect-testing-antipatterns.py     tier=1  blocking=true    ← silent pass guards, vacuous assertions, mock-only integration
+  validate-wo-status-integrity.sh    tier=1  blocking=true    ← status inflation prevention (wo_exit only)
+  validate-cross-boundary-contracts.sh  tier=1  blocking=true ← frontend-backend contract validation (cross-boundary only)
+
+ERROR HANDLING (1 gate — always on):
+  validate-swallowed-errors.sh       tier=2  blocking=false   ← empty catch blocks, bare except-pass, discarded error returns
+
+Total always-on: 21 gates
 
 ---
 
 ## CONDITIONAL GATES
+
+### VC Audit Enhancement Gates (new — triggered by deployment_context or AI usage)
+```
+IF deployment_context IN ["production", "customer-facing", "scale"]:
+  ENABLE:
+    validate-observability.sh          tier=2  blocking=false
+      config: REQUIRE_HEALTH=true
+    validate-resilience-patterns.sh    tier=2  blocking=false
+    validate-data-integrity.sh         tier=2  blocking=false
+    validate-api-contracts.sh          tier=2  blocking=false
+    validate-auth-boundaries.sh        tier=2  blocking=false
+
+IF deployment_context == "customer-facing" OR deployment_context == "scale":
+  MODIFY:
+    validate-observability.sh          → REQUIRE_METRICS=true, tier=1
+    validate-resilience-patterns.sh    → tier=1 blocking=true
+    validate-auth-boundaries.sh        → tier=1 blocking=true
+
+IF deployment_context == "scale":
+  MODIFY:
+    validate-observability.sh          → REQUIRE_TRACING=true
+    validate-resilience-patterns.sh    → REQUIRE_CIRCUIT_BREAKERS=true
+    validate-api-contracts.sh          → REQUIRE_SPEC=true REQUIRE_VERSIONING=true tier=1
+
+IF deployment_context == "prototype":
+  SKIP: validate-observability.sh, validate-resilience-patterns.sh, validate-api-contracts.sh
+  ENABLE (advisory only):
+    validate-data-integrity.sh         tier=3  blocking=false
+    validate-auth-boundaries.sh        tier=3  blocking=false
+```
+
+### AI Integration Gates
+```
+IF ai_provider is set OR features mention AI/LLM/ML:
+  ENABLE:
+    validate-ai-integration.sh         tier=2  blocking=false
+  SEE: decision-engine/ai-integration-patterns.md for tier upgrades based on ai_depth
+
+IF ai_depth IN ["core_pipeline", "autonomous", "model_owner"]:
+  MODIFY:
+    validate-ai-integration.sh         → REQUIRE_COST_CONTROLS=true  tier=1  blocking=true
+```
 
 ### Database Gates
 ```
@@ -84,6 +140,14 @@ IF compliance == ["none"]:
     validate-audit-completeness.sh   tier=3  blocking=false
     validate-pii-handling.sh         tier=3  blocking=false
     validate-owasp-alignment.sh      tier=3  blocking=false
+```
+
+### Cross-Boundary Validation
+```
+IF stack.language contains both a backend language AND a frontend framework (e.g., Python + TypeScript)
+OR IF directories matching both backend (src/, app/, server/) and frontend (frontend/, client/, web/) exist
+THEN enable:
+  validate-cross-boundary-contracts.sh  tier=1  blocking=true  (wo_exit and full_audit)
 ```
 
 ### Post-Deploy Gates

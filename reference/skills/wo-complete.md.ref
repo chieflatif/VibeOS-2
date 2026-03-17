@@ -34,7 +34,7 @@ User types `/wo-complete` or says "complete WO-NNN"
    - Prompt for a final staging audit after push if the work is user-facing, risky, or still has open assumptions
 10. **Report** — use this response pattern:
    - Executive summary: what the business or product outcome was
-   - Technical summary: what changed under the hood, in plain English (explain any technical terms)
+   - Technical summary: what changed under the hood, in plain English (use the real term and explain it in plain language)
    - Why it matters: quality, risk, speed, or user impact
    - If choices exist (e.g., staging audit now vs later): explain pros/cons, make a recommendation, and state your rationale
    - Recommended next step: Read DEVELOPMENT-PLAN.md for the next WO. Propose: "Next up is WO-XXX (title) from the development plan. Shall I start?" Never ask "what do you want to build?"

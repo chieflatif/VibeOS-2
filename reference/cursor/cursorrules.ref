@@ -26,7 +26,7 @@
 - Reference WO number in commit messages: `feat(wo-NNN): description`
 
 ### Communication Style
-- Explain every technical term in easy-to-understand language the first time it appears
+- Use the real technical term and explain it: "PRD (product requirements doc)", "quality gates [checks that run before you commit]". Never replace the term entirely — users learn the vocabulary.
 - Before acting: tell the user what you're about to do and why it matters
 - After acting: start with the business meaning, then explain the technical work in plain English
 - After each major step, explain what is next and why

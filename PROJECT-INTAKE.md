@@ -14,7 +14,7 @@ Questions remain organized in 4 rounds, but the agent should not force the user 
 - Before each question or choice, briefly explain what you're asking and why it matters.
 - Present inferred defaults explicitly: "I inferred X from your product definition. Keep or change?"
 - Do not lead with implementation-detail questions if the product definition is still incomplete.
-- If a question uses technical language, explain the term in easy terms before asking it.
+- If a question uses technical language, use the real term and explain it in plain language (e.g. "PRD (product requirements doc)") so the user learns the vocabulary.
 - Frame choices in outcome language first, then introduce technology names as the implementation mapping.
 - When presenting choices: always explain pros and cons, make a recommendation based on evidence, and explain your rationale.
 

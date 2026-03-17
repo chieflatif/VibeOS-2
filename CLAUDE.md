@@ -11,7 +11,8 @@ AGENT-BOOTSTRAP.md          ← Master playbook (agent entry point)
 PROJECT-INTAKE.md            ← 18-question structured intake
 decision-engine/             ← Decision trees for setup choices
         ↓ (agent reads, decides, executes)
-scripts/                     ← 22 scripts: 21 gates + gate-runner (copied to target project)
+scripts/                     ← 44 scripts: 42 gates + gate-runner + setup-git-hooks (copied to target project)
+convergence/                 ← 5 loop control scripts (state hash, convergence, baselines, findings lifecycle)
 reference/                   ← Annotated examples (agent reads + adapts)
 helpers/                     ← Mechanical utilities (agent calls)
 ```
@@ -65,4 +66,4 @@ bash scripts/gate-runner.sh pre_commit --continue-on-failure
 - Shell scripts: `#!/usr/bin/env bash`, `set -euo pipefail`
 - Exit codes: 0 = pass, 1 = fail, 2 = skip (graceful degradation)
 - Logging: `echo "[GATE_NAME] PASS|FAIL|WARN|SKIP: message"`
-- Version: `FRAMEWORK_VERSION="1.0.0"` in every script
+- Version: `FRAMEWORK_VERSION="2.0.0"` in every script

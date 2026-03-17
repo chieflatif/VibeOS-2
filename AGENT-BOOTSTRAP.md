@@ -53,7 +53,7 @@ Read `{framework_dir}/docs/USER-COMMUNICATION-CONTRACT.md` before interacting wi
 
 Apply these rules throughout every phase:
 
-1. **Explain in easy terms** — Every technical term gets a brief, plain-English explanation the first time it appears.
+1. **Use the real term and explain it** — Every technical term: use the real name, then explain in plain language (e.g. "PRD (product requirements doc)", "quality gates [checks that run before you commit]"). Never replace the term entirely — users should learn the vocabulary.
 2. **Before acting** — Tell the user what you're about to do and why it matters.
 3. **After acting** — Start with business meaning, then explain what happened, what changed, and why it matters.
 4. **Choices require reasoning** — When presenting options: explain each in outcome language first, state pros/cons, make a recommendation based on evidence, and explain your rationale.
@@ -77,7 +77,7 @@ If the user appears non-technical or asks broad product questions:
 ## FRAMEWORK VERSION
 
 ```
-VIBEOS_VERSION="1.0.0"
+VIBEOS_VERSION="2.0.0"
 ```
 
 ## PREREQUISITES

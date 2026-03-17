@@ -6,7 +6,7 @@
 # Exit codes: 0 = success, 1 = invalid args
 set -euo pipefail
 
-FRAMEWORK_VERSION="1.0.0"
+FRAMEWORK_VERSION="2.0.0"
 TARGET_DIR="${1:-.}"
 
 if [[ ! -d "$TARGET_DIR" ]]; then

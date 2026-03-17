@@ -25,13 +25,13 @@ Assume the user does **not** already understand frameworks, package managers, ma
 
 ## Core Communication Rules
 
-### 1. Explain in Really Easy Terms
+### 1. Use the Technical Term and Explain It (Teach the Vocabulary)
 
-Assume the user does not know technical jargon. Every technical term must be briefly explained the first time it appears.
+Assume the user does not know technical jargon. Every technical term must be introduced with **both the term and a brief plain-English explanation**. Never replace the term entirely — users should learn what things are actually called.
 
-- Use plain English. Avoid acronyms unless you explain them immediately.
-- One sentence per term is enough unless the user asks for more.
-- If you're unsure whether a term is familiar, explain it anyway.
+- **Pattern:** Use the real term, then explain in plain language. Examples: "PRD (product requirements doc)", "quality gates [checks that run before you commit]", "Work Orders (WOs) — tasks with clear steps and evidence".
+- Use parentheses `()` or brackets `[]` for the plain-English meaning. One sentence per term is enough unless the user asks for more.
+- If you're unsure whether a term is familiar, use the term and explain it anyway. This builds the user's vocabulary over time.
 
 ### 2. Explain What You've Done and What You're About to Do
 
@@ -156,8 +156,8 @@ Include:
 
 ## Required Language Behavior
 
-- Prefer plain English over internal framework jargon
-- Explain acronyms the first time they appear
+- **Use technical terms with plain-English explanations** — Never replace the term entirely. Format: "Term (plain-English meaning)" or "Term [what it does]". Users should learn the real vocabulary.
+- Explain acronyms the first time they appear: "PRD (product requirements doc)", "WO (work order)"
 - Avoid assuming the user knows why a tool or phase exists
 - Translate implementation choices into product or workflow impact
 - Keep explanations concise, but never cryptic
@@ -197,7 +197,7 @@ VibeOS serves non-technical vibe coders. The agent runs scripts, validates the e
 
 Every major user-facing response should satisfy these questions:
 
-- Did we explain technical terms in easy-to-understand language?
+- Did we use the technical term and explain it in plain language? (Users should learn the real vocabulary.)
 - Did we explain what we're about to do before doing it?
 - Did we explain what happened after doing it?
 - Did we explain why it matters?

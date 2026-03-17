@@ -1,5 +1,39 @@
 # Changelog
 
+## [2.0.0] — 2026-03-16
+
+### What's New (Plain English)
+
+- **Verification integrity** — 4 new gates that catch the ways autonomous builds lie to themselves: stale audit data, imagined API shapes, passing tests that prove nothing, and work marked "done" without evidence.
+- **Convergence control** — 5 new scripts that detect when the build is going in circles, track findings across sessions so the same issue isn't reported twice, and expire old baseline suppressions after 2 phases.
+- **VC-grade audit gates** — 6 new conditional gates for production-bound projects: observability, resilience, data integrity, API contracts, auth boundaries, and AI integration.
+- **Quality & architecture** — 3 new always-on gates for code complexity, dev environment hygiene, and test quality (mock density, TDD compliance).
+- **Additional gates** — Communication contract compliance, devmode fallback detection, environment variable completeness, infrastructure connectivity.
+- **Expanded references** — Quality Anchor template, engineering principles, deviations tracker, research registry, product anchor, prompt engineering bible, 12 Codex skill references.
+- **Decision engine** — 2 new decision trees (AI integration patterns, observability patterns) and gate-selection updated from 24 → 42 gates.
+
+### Added
+- **Verification integrity gates (4)** — `validate-worktree-freshness.sh` (tier 0, blocks stale worktree findings), `detect-testing-antipatterns.py` (silent pass guards, vacuous assertions, mock-only integration), `validate-wo-status-integrity.sh` (status inflation prevention), `validate-cross-boundary-contracts.sh` (frontend-backend contract validation).
+- **Convergence directory (5 scripts)** — `state-hash.sh` (codebase fingerprint for loop detection), `convergence-check.sh` (progress stall detection), `baseline-check.sh` (2-phase baseline expiry), `migrate-baseline.sh` (baseline format migration), `findings-lifecycle.sh` (finding dedup, regression detection, false positive suppression, pattern statistics).
+- **VC audit gates (5)** — `validate-observability.sh`, `validate-resilience-patterns.sh`, `validate-data-integrity.sh`, `validate-api-contracts.sh`, `validate-auth-boundaries.sh`. Conditional on deployment context.
+- **Quality gates (3)** — `validate-code-complexity.sh`, `validate-dev-environment.sh`, `test-quality-gate.sh`. Always on.
+- **AI integration gate** — `validate-ai-integration.sh`. Conditional on AI/LLM usage.
+- **Additional gates (4)** — `validate-communication-contract.sh`, `validate-devmode-fallbacks.sh`, `validate-env-completeness.sh`, `validate-infrastructure-connectivity.sh`.
+- **Setup utility** — `setup-git-hooks.sh` installs pre-commit hooks into target project.
+- **Decision engine (2)** — `ai-integration-patterns.md`, `observability-patterns.md`.
+- **Reference files** — `QUALITY-ANCHOR-TEMPLATE.md` (frozen quality standard), `DEVIATIONS.md.ref`, `ENGINEERING-PRINCIPLES.md.ref`, `RESEARCH-REGISTRY.md.ref`, `PRODUCT-ANCHOR.md.ref`, `cli-vs-mcp.md`, 12 Codex skill SKILL.md files, prompt-engineering-bible (17 files).
+
+### Changed
+- **FRAMEWORK_VERSION** bumped from `1.0.0` to `2.0.0` across all scripts, helpers, and AGENT-BOOTSTRAP.md.
+- **gate-selection.md** — Expanded from 24 to 42 gates. Added verification integrity (always-on), VC audit enhancement (conditional), AI integration (conditional), cross-boundary validation sections. Always-on count: 13 → 20.
+- **Baseline entries now expire after 2 phases** — they can no longer suppress findings indefinitely.
+
+### Fixed
+- False positive rate from stale audit worktrees (worktree freshness gate)
+- Frontend-backend contract drift (cross-boundary contracts gate)
+- Silent pass guards and vacuous assertions (testing antipatterns detector)
+- WO status inflation (status integrity gate)
+
 ## Unreleased
 
 ### What's New (Plain English)

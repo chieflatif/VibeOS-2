@@ -4,7 +4,7 @@
 # Exit codes: 0 = all required present, 1 = missing required tools, 2 = missing recommended only
 set -euo pipefail
 
-FRAMEWORK_VERSION="1.0.0"
+FRAMEWORK_VERSION="2.0.0"
 SCRIPT_NAME="verify-prerequisites"
 
 # Colors (if terminal supports them)

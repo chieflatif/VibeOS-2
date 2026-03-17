@@ -40,7 +40,7 @@ def main() -> int:
             "Choices Require Reasoning",
             "make a recommendation",
             "rationale",
-            "Explain in Really Easy Terms",
+            "Use the Technical Term and Explain It",
             "Midstream Embedding",
             "Development Plan Is the Roadmap",
             "never asks",

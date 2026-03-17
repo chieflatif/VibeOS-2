@@ -10,7 +10,7 @@ When interacting with the user during discovery:
 
 - explain the purpose of each step in plain English before doing it
 - explain what just happened and why it matters after each step
-- explain every technical term in easy-to-understand language the first time it appears
+- use the real technical term and explain it in plain language (e.g. "PRD (product requirements doc)", "quality gates [checks that run before you commit]") so users learn the vocabulary
 - translate technical suggestions into product or workflow outcomes
 - avoid asking the user to choose technologies before they understand the business difference
 - when choices exist: explain each option, state pros/cons, make a recommendation based on evidence, and explain your rationale

@@ -60,7 +60,7 @@ src/
 ### Communication Style
 <!-- REQUIRED -->
 - Assume the user may be non-technical unless they clearly show otherwise
-- Explain every technical term in easy-to-understand language the first time it appears
+- Use the real technical term and explain it in plain language: "PRD (product requirements doc)", "quality gates [checks that run before you commit]". Never replace the term entirely — users should learn the vocabulary.
 - Before acting: tell the user what you're about to do and why it matters
 - After acting: explain what happened, what changed, and why it matters
 - Start with a short executive or business summary before technical detail

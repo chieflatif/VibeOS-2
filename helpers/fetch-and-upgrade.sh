@@ -17,7 +17,7 @@
 #   2 = Invalid args / git not available
 set -euo pipefail
 
-FRAMEWORK_VERSION="1.0.0"
+FRAMEWORK_VERSION="2.0.0"
 SCRIPT_NAME="fetch-and-upgrade"
 DEFAULT_URL="https://github.com/chieflatif/VibeOS-2"
 CACHE_DIR="${VIBEOS_CACHE:-$HOME/.vibeos-cache/VibeOS-2}"
