@@ -2,7 +2,7 @@
 
 > **v2.0.0 — Verification Integrity Upgrade (2026-03-16)**
 >
-> This release fixes 6 systemic failure modes found during production use across 24 phases and 156 work orders. During an 8-hour autonomous build session, the framework reported 6,175 passing tests and 0 critical findings — a post-session audit revealed 67% of findings were false positives from stale worktrees, every frontend page 404'd against the real backend, and 3 work orders were falsely marked Complete. Version 2.0 adds **4 verification integrity gates**, **5 convergence scripts**, **2 new decision trees**, and expands the gate count from 24 to 42. Baseline entries now expire after 2 phases. See [CHANGELOG.md](CHANGELOG.md) for full details.
+> VibeOS 1.0 completed an 8-hour fully autonomous build session — 24 phases, 156 work orders, 6,175 passing tests, zero human intervention. That level of sustained autonomous development exposed structural gaps that only surface at scale: worktree staleness across long sessions, cross-boundary contract drift between frontend and backend, and baseline suppressions that never expired. Version 2.0 closes every one of those gaps with **4 verification integrity gates**, **5 convergence scripts**, **2 new decision trees**, and expands the gate count from 24 to 42. The framework now verifies its own verification. See [CHANGELOG.md](CHANGELOG.md) for full details.
 
 **Governance that speaks your language.**
 
