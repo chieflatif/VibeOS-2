@@ -411,7 +411,7 @@ Read `{framework_dir}/decision-engine/hook-selection.md`. Apply rules:
 
 ```
 IF agent_type == "claude-code":
-  ALWAYS: secrets-scan, frozen-files, session-start, session-resume, capture-failure
+  ALWAYS: secrets-scan, frozen-files, session-start, session-resume, capture-failure, worktree-bash-guard, worktree-scope-guard
   IF production_urls is not empty: staging-target
   IF compliance is not ["none"]: governance-guard
   IF using subagents: validate-audit-result
@@ -1194,6 +1194,11 @@ Complete settings.json structure for hook wiring:
           {
             "type": "command",
             "command": ".claude/hooks/pre-tool/frozen-files.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-tool/worktree-scope-guard.sh",
+            "timeout": 5
           }
         ]
       },
@@ -1203,6 +1208,11 @@ Complete settings.json structure for hook wiring:
           {
             "type": "command",
             "command": ".claude/hooks/pre-tool/staging-target.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-tool/worktree-bash-guard.sh",
+            "timeout": 5
           }
         ]
       }
